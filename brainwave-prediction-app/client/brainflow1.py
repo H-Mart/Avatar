@@ -54,7 +54,7 @@ class bciConnection():
             # format data cols.
             self.column_labels = []
             for num in range(32):
-                self.column_labels.append("c"+str(num))
+                self.column_labels.append("c" + str(num))
 
             # read eeg data from the board -- will start a bci session with your current board
             # allowing it to stream to BCI Gui App and collect 10 second data sample

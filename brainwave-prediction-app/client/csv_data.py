@@ -41,9 +41,10 @@ print(response.json())
 
 column_labels = []
 for num in range(32):
-    column_labels.append("c"+str(num))
+    column_labels.append("c" + str(num))
 
-df = pd.read_csv('/Users/williamdoyle/Documents/GitHub/Brain-Computer-Interface/BrainFlow-RAW_Recordings_jn_land_5.csv', delimiter='\t',
+df = pd.read_csv('/Users/williamdoyle/Documents/GitHub/Brain-Computer-Interface/BrainFlow-RAW_Recordings_jn_land_5.csv',
+                 delimiter='\t',
                  names=column_labels)
 
 response = send_data_to_server(df)

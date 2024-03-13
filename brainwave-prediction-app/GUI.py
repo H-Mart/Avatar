@@ -4,7 +4,6 @@ import random
 import cv2
 from client.brainflow1 import bciConnection
 
-
 from gui_windows.manual_drone_control_window import Drone_Control
 from gui_windows.brainwave_prediction_window import Brainwaves
 from gui_windows.transfer_files_window import TransferData
@@ -14,6 +13,8 @@ from gui_windows.transfer_files_window import TransferData
 from djitellopy import Tello
 
 tello = Tello()
+
+
 # tello.takeoff()
 
 
@@ -21,7 +22,6 @@ tello = Tello()
 
 
 def get_drone_action(action):
-
     if action == 'connect':
         tello.connect()
         print("tello.connect()")
@@ -130,53 +130,54 @@ def holding_pattern_window():
             resume_hold = True
     holding_pattern_window.close()
 
-#COMMENTS FOR ISSUE 39: THESE ARE THE BUTTONS THAT NEED TO CHANGE (start here) ---------
-#LAYOUT1 = PySimpleGui is called as 'sg'
-#Syntax for the button is sg.Button('text of button', size = (characters wide, characters tall)
-#.read() = save values as a tuple (event, values)
-#An event is pressing a button or closing the window. 
-#We'll need a tab group, tabs for the individual items (so 4)
-#And a way of linking the content to each tab.
 
-#added tabs for the tabgroup
+# COMMENTS FOR ISSUE 39: THESE ARE THE BUTTONS THAT NEED TO CHANGE (start here) ---------
+# LAYOUT1 = PySimpleGui is called as 'sg'
+# Syntax for the button is sg.Button('text of button', size = (characters wide, characters tall)
+# .read() = save values as a tuple (event, values)
+# An event is pressing a button or closing the window.
+# We'll need a tab group, tabs for the individual items (so 4)
+# And a way of linking the content to each tab.
+
+# added tabs for the tabgroup
 brainwaveObj = Brainwaves(get_drone_action)
 brainwave_tab = brainwaveObj.brainwave_prediction_window(get_drone_action, use_brainflow)
 
-transferDataObj = TransferData ()
-transferData_tab = transferDataObj.transfer_files_window ()
+transferDataObj = TransferData()
+transferData_tab = transferDataObj.transfer_files_window()
 
 DroneControlObj = Drone_Control()
 manDroneCtrlTab = DroneControlObj.manual_drone_control_window(get_drone_action)
 
-t4Test = sg.Text('Disabled for now',text_color='Red')
+t4Test = sg.Text('Disabled for now', text_color='Red')
 holdPatTab = [[t4Test]]
 
-#new layout designed
+# new layout designed
 layout1 = [[sg.TabGroup([[
     brainwave_tab,
     transferData_tab,
     manDroneCtrlTab,
-    sg.Tab('Holding Pattern', holdPatTab,key='Holding Pattern')]],
-    key='layout1',enable_events=True)]]
+    sg.Tab('Holding Pattern', holdPatTab, key='Holding Pattern')]],
+    key='layout1', enable_events=True)]]
 
 # Create the windows
-window1 = sg.Window('Start Page', layout1, size=(1600,1600),element_justification='c',resizable=True,finalize=True)
+window1 = sg.Window('Start Page', layout1, size=(1600, 1600), element_justification='c', resizable=True, finalize=True)
 window1.Maximize()
 
 # Event loop for the first window
-#changed what the buttons do to tabs
+# changed what the buttons do to tabs
 while True:
     event1, values1 = window1.read()
     activeTab = window1['layout1'].Get()
-    
+
     if event1 == sg.WIN_CLOSED:
         break
     elif activeTab == 'Brainwave Reading':
         brainwaveObj.buttonLoop(window1, event1, values1, get_drone_action, use_brainflow)
     elif activeTab == 'Transfer Data':
-        transferDataObj.buttonLoop (window1, event1, values1)
+        transferDataObj.buttonLoop(window1, event1, values1)
     elif activeTab == 'Manual Drone Control':
-        #window1.hide()
+        # window1.hide()
         DroneControlObj.buttonLoopDrone(get_drone_action, window1, event1, values1)
-    #elif activeTab == 'Holding Pattern':
-        #holding_pattern_window()
+    # elif activeTab == 'Holding Pattern':
+    # holding_pattern_window()
