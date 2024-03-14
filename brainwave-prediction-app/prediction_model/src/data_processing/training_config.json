@@ -20,6 +20,6 @@
   },
   "models": {
     "save_directory": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/saved_models",
-    "metric_plots": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/model_stats/plots"
+    "stats": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/model_stats"
   }
 }

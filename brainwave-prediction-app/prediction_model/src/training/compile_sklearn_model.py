@@ -16,6 +16,7 @@ class TrainTestData:
     X_test: Any
     y_train: Any
     y_test: Any
+    label_map: Any
 
 
 def ready_data() -> TrainTestData:
@@ -28,7 +29,9 @@ def ready_data() -> TrainTestData:
     X = pdf.drop(columns=[label, 'filename'])
     y = pdf[label]
 
-    return TrainTestData(*train_test_split(X, y, test_size=0.2))
+    label_map = {classes.index(c): c for c in classes}
+
+    return TrainTestData(*train_test_split(X, y, test_size=0.2), label_map)
 
 
 def save_model(model: RandomForestClassifier, save_path: Path):
@@ -41,26 +44,15 @@ def load_model(save_path: Path) -> RandomForestClassifier:
         return pickle.load(f)
 
 
-def train_model(data: TrainTestData, n_estimators=100, max_depth=16, save=True, save_name=None):
+def train_model(data: TrainTestData, n_estimators=100, max_depth=16, criterion='gini', save=True, save_name=None):
     model = RandomForestClassifier(
-        n_estimators=n_estimators, max_depth=max_depth,
+        n_estimators=n_estimators, max_depth=max_depth, criterion=criterion,
         n_jobs=-1, verbose=2)
 
     model.fit(data.X_train, data.y_train)
 
     if save:
-        save_name = save_name or f'{n_estimators}_estimators_{max_depth}_depth.model'
+        save_name = save_name or f'{n_estimators}_estimators_{max_depth}_depth_{criterion}.model'
         save_model(model, config.model_save_dir_path / save_name)
 
     return model
-
-
-def main():
-    estimators = [1, 5, 10, 20, 50, 100]
-    data = ready_data()
-    for e in estimators:
-        model = train_model(data, e)
-
-
-if __name__ == '__main__':
-    main()

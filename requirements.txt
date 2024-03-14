@@ -9,3 +9,9 @@ matplotlib
 scikit-learn
 scipy
 delta-spark
+pysftp
+PySimpleGUI==4.60.5
+flask
+tensorflow
+tensorflow_decision_forests
+requests

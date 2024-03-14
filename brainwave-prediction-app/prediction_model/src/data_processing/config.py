@@ -18,7 +18,7 @@ spark_driver_memory: str = spark_config['driver_memory']
 spark_timeout: str = spark_config['timeout']
 
 model_save_dir_path = Path(config_obj['models']['save_directory'])
-model_plots_path = Path(config_obj['models']['metric_plots'])
+model_stats_path = Path(config_obj['models']['stats'])
 
 logging.basicConfig(
     filename='debug.log',

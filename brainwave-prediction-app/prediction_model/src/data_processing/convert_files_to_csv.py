@@ -22,8 +22,6 @@ def convert_txt_to_csv(file_path):
 
 def get_all_txt_files(directory):
     for dirpath, dirnames, files in os.walk(directory):
-        category = os.path.basename(dirpath)
-
         # Check if there are any txt files in the directory
         txt_files = [f for f in files if f.endswith('.txt')]
         if txt_files:
