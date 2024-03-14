@@ -1,0 +1,25 @@
+{
+  "data_paths": {
+    "compressed_raw": "/mnt/i/bci_data/brainwave_rawdata.zip",
+    "base": "/mnt/i/bci_data/",
+    "raw": "brainwave_rawdata",
+    "processed": "brainwave_processed",
+    "filtered": "brainwave_filtered",
+    "deltalake_table": "deltalake_brainwave"
+  },
+  "butterworth_filter_params": {
+    "lowcut": 5,
+    "highcut": 50,
+    "sampling_rate": 125,
+    "order": 4
+  },
+  "spark": {
+    "executor_memory": "8g",
+    "driver_memory": "8g",
+    "timeout": "800s"
+  },
+  "models": {
+    "save_directory": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/saved_models",
+    "metric_plots": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/model_stats/plots"
+  }
+}

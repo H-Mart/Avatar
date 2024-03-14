@@ -3,3 +3,9 @@ Avatar
 djitellopy
 opencv-python
 brainflow
+numpy
+pandas
+matplotlib
+scikit-learn
+scipy
+delta-spark
