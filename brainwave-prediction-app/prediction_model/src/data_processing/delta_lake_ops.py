@@ -16,3 +16,9 @@ def save_table(df: pyspark.sql.DataFrame):
         .option("overwriteSchema", "true") \
         .option("delta.columnMapping.mode", "name") \
         .save(str(deltalake_table_path.absolute()))
+
+
+if __name__ == '__main__':
+    df = load_table()
+    print(df.schema)
+    df.summary().show()

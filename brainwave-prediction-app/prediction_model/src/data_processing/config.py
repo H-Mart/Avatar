@@ -11,6 +11,8 @@ extract_dir_path = base_data_path / Path(data_paths['raw'])
 processed_dir_path = base_data_path / Path(data_paths['processed'])
 filtered_dir_path = base_data_path / Path(data_paths['filtered'])
 deltalake_table_path = base_data_path / Path(data_paths['deltalake_table'])
+set_aside_path = base_data_path / Path(data_paths['set_aside'])
+processed_minus_set_aside = base_data_path / Path(data_paths['processed_minus_set_aside'])
 
 spark_config: dict = config_obj['spark']
 spark_executor_memory: str = spark_config['executor_memory']
@@ -19,6 +21,9 @@ spark_timeout: str = spark_config['timeout']
 
 model_save_dir_path = Path(config_obj['models']['save_directory'])
 model_stats_path = Path(config_obj['models']['stats'])
+
+headset_streaming_host: str = config_obj['headset_streaming']['host']
+headset_streaming_port: int = config_obj['headset_streaming']['port']
 
 logging.basicConfig(
     filename='debug.log',

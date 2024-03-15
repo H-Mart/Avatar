@@ -44,10 +44,11 @@ def load_model(save_path: Path) -> RandomForestClassifier:
         return pickle.load(f)
 
 
-def train_model(data: TrainTestData, n_estimators=100, max_depth=16, criterion='gini', save=True, save_name=None):
+def train_model(data: TrainTestData, n_estimators=100, max_depth=16, criterion='gini', save=True, save_name=None,
+                jobs=-1):
     model = RandomForestClassifier(
         n_estimators=n_estimators, max_depth=max_depth, criterion=criterion,
-        n_jobs=-1, verbose=2)
+        n_jobs=jobs, verbose=2)
 
     model.fit(data.X_train, data.y_train)
 
@@ -56,3 +57,4 @@ def train_model(data: TrainTestData, n_estimators=100, max_depth=16, criterion='
         save_model(model, config.model_save_dir_path / save_name)
 
     return model
+

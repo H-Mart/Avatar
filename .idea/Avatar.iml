@@ -16,9 +16,11 @@
     <option name="myDocStringFormat" value="Google" />
   </component>
   <component name="TemplatesService">
+    <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
     <option name="TEMPLATE_FOLDERS">
       <list>
         <option value="$MODULE_DIR$/brainwave-prediction-app/prediction_server/server/templates" />
+        <option value="$MODULE_DIR$/brainwave-prediction-app/prediction_model/src/server/templates" />
       </list>
     </option>
   </component>

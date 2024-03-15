@@ -1,0 +1,55 @@
+explore:
+    fft
+    windowing
+    filtering
+
+https://brainflow.readthedocs.io/en/stable/Examples.html#python-real-time-plot
+create example thingy to test brain reading and categorization
+
+brainflow streamer param parsing
+https://github.com/brainflow-dev/brainflow/blob/master/src/board_controller/board.cpp#L373
+"format is streamer_type://streamer_dest:streamer_args"
+
+how it is used is here
+https://github.com/brainflow-dev/brainflow/blob/master/src/board_controller/board.cpp#L267
+
+supported streamers:
+    file - file://
+    multicast - streaming_board://
+    plotjuggler_udp - plotjuggler_udp://
+
+this is the board we are using:
+https://github.com/brainflow-dev/brainflow/blob/master/src/board_controller/openbci/inc/cyton_daisy.h
+https://github.com/brainflow-dev/brainflow/blob/master/src/board_controller/openbci/cyton_daisy.cpp
+
+Actually this is not the data that is sent, it is the data used internally
+The data that is sent is in the format of:
+https://docs.openbci.com/Software/OpenBCISoftware/GUIDocs/#cyton
+array[32] of doubles:
+    0: sample number
+    1-8: eeg data (cyton board)
+    9-16: eeg data (daisy board)
+    17-19: accel data
+    20: unused
+    21-24: digital channel 0-3 (not used for us)
+    25: unused
+    26: digital channel 4 (not used for us)
+    27-29: analog channel 0-2
+    30: timestamp
+    31: marker
+
+
+/*
+        Byte 1: 0xA0
+        Byte 2: Sample Number
+        Bytes 3-5: Data value for EEG channel 1
+        Bytes 6-8: Data value for EEG channel 2
+        Bytes 9-11: Data value for EEG channel 3
+        Bytes 12-14: Data value for EEG channel 4
+        Bytes 15-17: Data value for EEG channel 5
+        Bytes 18-20: Data value for EEG channel 6
+        Bytes 21-23: Data value for EEG channel 6
+        Bytes 24-26: Data value for EEG channel 8
+        Aux Data Bytes 27-32: 6 bytes of data
+        Byte 33: 0xCX where X is 0-F in hex
+*/

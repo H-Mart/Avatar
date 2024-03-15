@@ -5,7 +5,9 @@
     "raw": "brainwave_rawdata",
     "processed": "brainwave_processed",
     "filtered": "brainwave_filtered",
-    "deltalake_table": "deltalake_brainwave"
+    "deltalake_table": "deltalake_brainwave",
+    "set_aside": "set_aside",
+    "processed_minus_set_aside": "processed_minus_set_aside"
   },
   "butterworth_filter_params": {
     "lowcut": 5,
@@ -21,5 +23,9 @@
   "models": {
     "save_directory": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/saved_models",
     "stats": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/model_stats"
+  },
+  "headset_streaming": {
+    "port": 5000,
+    "host": "224.0.0.1"
   }
 }
