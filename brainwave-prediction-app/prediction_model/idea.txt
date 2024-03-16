@@ -22,6 +22,8 @@ this is the board we are using:
 https://github.com/brainflow-dev/brainflow/blob/master/src/board_controller/openbci/inc/cyton_daisy.h
 https://github.com/brainflow-dev/brainflow/blob/master/src/board_controller/openbci/cyton_daisy.cpp
 
+BRAINFLOW_BATCH_SIZE is an env variable that controls the number of data packages that are sent
+
 Actually this is not the data that is sent, it is the data used internally
 The data that is sent is in the format of:
 https://docs.openbci.com/Software/OpenBCISoftware/GUIDocs/#cyton

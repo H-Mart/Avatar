@@ -21,11 +21,12 @@
     "timeout": "800s"
   },
   "models": {
-    "save_directory": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/saved_models",
+    "save_directory": "/mnt/i/bci_data/saved_models",
     "stats": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/model_stats"
   },
   "headset_streaming": {
     "port": 5000,
-    "host": "224.0.0.1"
+    "host": "224.0.0.1",
+    "batch_size": 10
   }
 }

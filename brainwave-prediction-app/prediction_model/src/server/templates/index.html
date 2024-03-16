@@ -3,8 +3,13 @@
 <head>
     <title>BCI Data Display</title>
     <style>
-        body { font: 16px Arial; }
-        #predictions { margin-top: 30px; }
+        body {
+            font: 16px Arial;
+        }
+
+        #predictions {
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
@@ -14,22 +19,24 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
 <script type="text/javascript">
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    {#var socket = io.connect('http://' + document.domain + ':' + location.port);#}
+    var socket = io();
 
-    document.getElementById('startBtn').onclick = function() {
+    document.getElementById('startBtn').onclick = function () {
         socket.emit('start_predicting');
     };
 
-    document.getElementById('stopBtn').onclick = function() {
+    document.getElementById('stopBtn').onclick = function () {
         socket.emit('stop_predicting');
     };
 
-    socket.on('new_prediction', function(msg) {
+
+    socket.on('new_prediction', function (msg) {
         var predictionsElement = document.getElementById('predictions');
         predictionsElement.textContent = 'Prediction: ' + msg.prediction;
     });
 
-    socket.on('status', function(msg) {
+    socket.on('status', function (msg) {
         console.log(msg.message);
     });
 </script>

@@ -24,6 +24,7 @@ model_stats_path = Path(config_obj['models']['stats'])
 
 headset_streaming_host: str = config_obj['headset_streaming']['host']
 headset_streaming_port: int = config_obj['headset_streaming']['port']
+brainflow_batch_size: int = config_obj['headset_streaming']['batch_size']
 
 logging.basicConfig(
     filename='debug.log',

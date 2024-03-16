@@ -76,6 +76,8 @@ def set_aside_files(raw_path: Path):
             new_path.parent.mkdir(parents=True, exist_ok=True)
             p.rename(new_path)
 
+    convert_files_to_csv.run(set_aside_path.absolute())
+
 
 def filter_files(processed_path: Path, filtered_path: Path):
     print(f'Filtering files from {processed_path} to {filtered_path}')

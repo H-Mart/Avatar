@@ -9,7 +9,7 @@ from ..brain_reading import models
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-predictor = models.Predictor(250, 1)
+predictor = models.Predictor(125, 1)
 
 
 @app.route('/')
@@ -19,6 +19,9 @@ def index():
 
 @socketio.on('start_predicting')
 def start_predicting():
+    if predictor.is_predicting():
+        emit('status', {'message': 'Already predicting.'})
+        return
     predictor.start_predicting()
     socketio.start_background_task(background_thread)
     emit('status', {'message': 'Started predicting.'})
@@ -31,7 +34,6 @@ def stop_predicting():
 
 
 def background_thread():
-    """Example of how to send server generated events to clients."""
     while not predictor.stop_event.is_set():
         time.sleep(.5)
         current_prediction = predictor.get_current_prediction()
@@ -39,4 +41,9 @@ def background_thread():
 
 
 if __name__ == '__main__':
+    # Suppress warnings for the sake of testing
+    import warnings
+
+    warnings.warn = lambda *args, **kwargs: None
+
     socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
