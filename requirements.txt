@@ -7,6 +7,7 @@ numpy
 pandas
 matplotlib
 scikit-learn
+scikit-learn-intelex
 scipy
 delta-spark
 pysftp

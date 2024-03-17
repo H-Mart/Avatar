@@ -26,6 +26,8 @@ headset_streaming_host: str = config_obj['headset_streaming']['host']
 headset_streaming_port: int = config_obj['headset_streaming']['port']
 brainflow_batch_size: int = config_obj['headset_streaming']['batch_size']
 
+use_intelex: bool = config_obj['training']['use_intelex']
+
 logging.basicConfig(
     filename='debug.log',
     level=logging.DEBUG,

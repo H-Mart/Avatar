@@ -1,3 +1,5 @@
+import pathlib
+
 import pyspark
 from delta import configure_spark_with_delta_pip
 from pyspark.sql.functions import lit, input_file_name
@@ -34,7 +36,7 @@ class SparkSessionManager:
         return self._instance._spark_session
 
 
-def df_from_csvs() -> pyspark.sql.DataFrame:
+def df_from_csvs(base_path: pathlib.Path = processed_dir_path) -> pyspark.sql.DataFrame:
     spark = SparkSessionManager().spark_session
     path_glob_filter = '*.csv'
 
@@ -43,20 +45,19 @@ def df_from_csvs() -> pyspark.sql.DataFrame:
                       ' Timestamp (Formatted)']
 
     takeoff = spark.read.options(delimiter=',').csv(
-        str(processed_dir_path / "takeoff"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "takeoff"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
     land_df = spark.read.options(delimiter=',').csv(
-        str(processed_dir_path / "land"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "land"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
     left_df = spark.read.options(delimiter=',').csv(
-        str(processed_dir_path / "left"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "left"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
     right_df = spark.read.options(delimiter=',').csv(
-        str(processed_dir_path / "right"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "right"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
     forward = spark.read.options(delimiter=',').csv(
-        str(processed_dir_path / "forward"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "forward"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
     backward = spark.read.options(delimiter=',').csv(
-        str(processed_dir_path / "backward"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "backward"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
 
     # Add labels to the data
-
     labels = ['takeoff', 'land', 'left', 'right', 'forward', 'backward']
 
     takeoff = takeoff.withColumn("label", lit("takeoff"))

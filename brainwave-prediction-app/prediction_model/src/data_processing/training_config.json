@@ -6,6 +6,7 @@
     "processed": "brainwave_processed",
     "filtered": "brainwave_filtered",
     "deltalake_table": "deltalake_brainwave",
+    "deltalake_table_minus_set_aside": "deltalake_brainwave",
     "set_aside": "set_aside",
     "processed_minus_set_aside": "processed_minus_set_aside"
   },
@@ -23,6 +24,9 @@
   "models": {
     "save_directory": "/mnt/i/bci_data/saved_models",
     "stats": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/model_stats"
+  },
+  "training": {
+    "use_intelex" : true
   },
   "headset_streaming": {
     "port": 5000,

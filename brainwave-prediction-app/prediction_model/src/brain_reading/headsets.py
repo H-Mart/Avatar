@@ -84,6 +84,9 @@ class SimHeadsetStreamer(HeadsetStreamer):
             self.files = np.array(sorted([(p.relative_to(config.set_aside_path).parents[-2].name, p)
                                           for p in
                                           config.set_aside_path.glob('**/*.csv')]))
+            # self.files = np.array(sorted([(p.relative_to(config.processed_minus_set_aside).parents[-2].name, p)
+            #                               for p in
+            #                               config.processed_minus_set_aside.glob('**/*.csv')]))
 
             self.df = None
             self.data_array = None
@@ -98,27 +101,34 @@ class SimHeadsetStreamer(HeadsetStreamer):
             self.package_buffer = np.empty(32 * config.brainflow_batch_size, dtype=np.float64)
             self.is_ready = False
 
-        def interleave_files(self, n):
-            category_counts = list(Counter([label for file, label in self.files]).values())
-            category_indices = np.cumsum([0] + category_counts[:-1])
-            interleaved = np.zeros(len(self.files), dtype=np.object_)
-            while more := True:
-                for i in range(len(category_counts)):
-                    f_idx = category_indices[i]
+        def interleave_dataframe(self, n, data: pd.DataFrame, cat_col: int) -> pd.DataFrame:
+            data = data.to_numpy()
+            categories, counts = np.unique(data[:, cat_col], return_counts=True)
+            interleaved = np.empty(data.shape, dtype=object)
+            end_idx = np.cumsum(counts)
+            cur_idx = np.cumsum(np.concatenate(([0], counts[:-1])))
+            out_idx = 0
+            while out_idx < len(data):
+                for cat_idx, e in enumerate(end_idx):
+                    if cur_idx[cat_idx] < e:
+                        num = min(n, e - cur_idx[cat_idx])
+                        interleaved[out_idx:out_idx + num] = data[cur_idx[cat_idx]: cur_idx[cat_idx] + num]
+                        cur_idx[cat_idx] += num
+                        out_idx += num
+            return pd.DataFrame(interleaved)
 
         def prepare_session(self):
-            self.df = self._load_files()
+            self.df = self.interleave_dataframe(250, self._load_files(), -2)
             self.data_array = self.df.drop(columns=self.df.columns[[-1, -2]]).to_numpy(copy=True, dtype=np.float64)
 
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
             self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
-            # self.sock.sendto(b'0', (self.ip, self.port))
             self.is_ready = True
 
         def start_stream(self, *args, **kwargs):
             def _stream():
                 self._wait_for_ready()
-
+                print('starting stream')
                 data_idx = buf_idx = 0
                 last_file = self.df.iloc[buf_idx, -1]
                 last_label = None
@@ -168,7 +178,7 @@ class SimHeadsetStreamer(HeadsetStreamer):
 
         def _load_files(self):
             dfs = []
-            for file, label in self.files:
+            for label, file in self.files:
                 df = pd.read_csv(file, index_col=None)
                 df.drop(columns=df.columns[-1], inplace=True)  # drop the formatted timestamp column
                 df['label'] = label

@@ -1,17 +1,16 @@
-import shutil
-import subprocess
 import zipfile
 import json
-from pathlib import Path
-import os
 import logging
-import sys
-
-sys.path.append('..')
-import convert_files_to_csv
-import data_preprocessing
-from config import extract_dir_path, processed_dir_path, filtered_dir_path, set_aside_path, processed_minus_set_aside
 import random
+import shutil
+from time import time
+
+from pathlib import Path
+import concurrent.futures
+
+from . import convert_files_to_csv, data_preprocessing, rename_files
+from .config import extract_dir_path, processed_dir_path, filtered_dir_path, set_aside_path, processed_minus_set_aside
+from .. import utils
 
 base_path = Path(__file__).parent
 config_path = base_path / 'training_config.json'
@@ -19,10 +18,20 @@ config_path = base_path / 'training_config.json'
 # make sure base_path is correct
 assert config_path.exists(), f'Config file not found at {config_path}'
 
+threadpool_executor = concurrent.futures.ThreadPoolExecutor(1000)
+
 
 def extract_zip(zip_path: Path, extract_path: Path):
+    print(f'Extracting {zip_path} to {extract_path}')
+    start = time()
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_path)
+        names = zip_ref.filelist
+        print(f'Extracting {len(names)} files')
+        futures = [threadpool_executor.submit(zip_ref.extract, name, path=extract_path) for name in names]
+        concurrent.futures.wait(futures)
+
+    print(f'Extraction took {time() - start:.2f} seconds')
+    print(f'Extraction complete')
 
 
 def check_extraction(raw_path: Path):
@@ -43,12 +52,10 @@ def process_files(raw_path: Path, processed_path: Path):
 
     print(f'Processing raw data at {actual_raw_path}')
 
-    print('Renaming files')
-    shell_script_path = base_path / 'rename_files.sh'
-    subprocess.run((shell_script_path.absolute(), actual_raw_path.absolute()))
-
-    print('Converting files to CSV')
     convert_files_to_csv.run(actual_raw_path.absolute())
+
+    print('Renaming files')
+    rename_files.run(actual_raw_path.absolute())
 
     print(f'Moving processed data to {processed_path}')
     for category in actual_raw_path.iterdir():
@@ -61,49 +68,50 @@ def process_files(raw_path: Path, processed_path: Path):
     raw_path.rmdir()
 
 
-def set_aside_files(raw_path: Path):
+def set_aside_files(raw_path: Path, set_aside_percent=0.2):
+    print(f'Setting aside {set_aside_percent * 100}% of files from {raw_path}')
     actual_raw_path = raw_path / 'brainwave_rawdata'
     check_extraction(raw_path)
 
     to_set_aside = []
     for category in actual_raw_path.iterdir():
-        to_set_aside.extend(random.sample(list(category.iterdir()), 2))
+        to_set_aside.extend(
+            random.sample(list(category.iterdir()), int(len(list(category.iterdir())) * set_aside_percent)))
 
-    for item in to_set_aside:
-        category = item.parent
-        for p in item.glob('**/*'):
-            new_path = set_aside_path / category.name / p.relative_to(category)
-            new_path.parent.mkdir(parents=True, exist_ok=True)
-            p.rename(new_path)
+    futures = [threadpool_executor.submit(utils.move, item, set_aside_path / item.parent.name / item.name)
+               for item in to_set_aside]
+    concurrent.futures.wait(futures)
 
     convert_files_to_csv.run(set_aside_path.absolute())
 
 
 def filter_files(processed_path: Path, filtered_path: Path):
     print(f'Filtering files from {processed_path} to {filtered_path}')
+    files = []
     for category in processed_path.iterdir():
         for file in category.iterdir():
             filtered_file_path = filtered_path / category.name / file.name
             filtered_file_path.parent.mkdir(parents=True, exist_ok=True)
-            data_preprocessing.filter_file(file, filtered_file_path)
+            files.append((file, filtered_file_path))
+
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        futures = [executor.submit(data_preprocessing.filter_file, file, filtered_file)
+                   for file, filtered_file in files]
+        concurrent.futures.wait(futures)
 
 
 def clear_directory(directory: Path):
-    for root, dirs, files in os.walk(directory, topdown=False):
-        for name in files:
-            os.remove(os.path.join(root, name))
-        for name in dirs:
-            os.rmdir(os.path.join(root, name))
+    for f in directory.iterdir():
+        shutil.rmtree(f)
 
 
 def remove_non_txt_files(directory: Path):
-    for root, dirs, files in os.walk(directory, topdown=False):
-        for name in files:
-            if not name.endswith('.txt'):
-                os.remove(os.path.join(root, name))
+    for f in directory.rglob('*'):
+        if f.is_file() and f.suffix != '.txt':
+            f.unlink()
 
 
-def main():
+def run(set_aside_percent=0.2):
     with config_path.open() as f:
         data_paths = json.load(f)['data_paths']
 
@@ -127,7 +135,7 @@ def main():
 
     extract_zip(zip_path, extract_dir_path)
     remove_non_txt_files(extract_dir_path)
-    set_aside_files(extract_dir_path)
+    set_aside_files(extract_dir_path, set_aside_percent)
     process_files(extract_dir_path, processed_minus_set_aside)
 
     extract_zip(zip_path, extract_dir_path)
@@ -137,4 +145,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run()

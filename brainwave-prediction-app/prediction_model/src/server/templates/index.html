@@ -7,20 +7,59 @@
             font: 16px Arial;
         }
 
-        #predictions {
-            margin-top: 30px;
+        .prediction-container {
+            margin-top: 10px;
+        }
+
+        .prediction-label {
+            margin-bottom: 5px;
+        }
+
+        .prediction-bar {
+            width: 0%;
+            background-color: #4CAF50;
+            text-align: right;
+            padding: 3px;
+            color: white;
+            height: 30px;
+            transition: width 0.5s;
         }
     </style>
 </head>
 <body>
-<div id="predictions"></div>
+<div id="predictions">
+    <div class="prediction-container">
+        <div class="prediction-label">forward</div>
+        <div id="prediction-forward" class="prediction-bar">0%</div>
+    </div>
+    <div class="prediction-container">
+        <div class="prediction-label">backward</div>
+        <div id="prediction-backward" class="prediction-bar">0%</div>
+    </div>
+    <div class="prediction-container">
+        <div class="prediction-label">land</div>
+        <div id="prediction-land" class="prediction-bar">0%</div>
+    </div>
+    <div class="prediction-container">
+        <div class="prediction-label">takeoff</div>
+        <div id="prediction-takeoff" class="prediction-bar">0%</div>
+    </div>
+    <div class="prediction-container">
+        <div class="prediction-label">left</div>
+        <div id="prediction-left" class="prediction-bar">0%</div>
+    </div>
+    <div class="prediction-container">
+        <div class="prediction-label">right</div>
+        <div id="prediction-right" class="prediction-bar">0%</div>
+    </div>
+    <!-- Repeat for other predictions -->
+</div>
 <button id="startBtn">Start Predicting</button>
 <button id="stopBtn">Stop Predicting</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
 <script type="text/javascript">
-    {#var socket = io.connect('http://' + document.domain + ':' + location.port);#}
-    var socket = io();
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
 
     document.getElementById('startBtn').onclick = function () {
         socket.emit('start_predicting');
@@ -30,15 +69,26 @@
         socket.emit('stop_predicting');
     };
 
-
-    socket.on('new_prediction', function (msg) {
-        var predictionsElement = document.getElementById('predictions');
-        predictionsElement.textContent = 'Prediction: ' + msg.prediction;
+    socket.on('new_prediction', function (predictions) {
+        updatePredictions(predictions.prediction);
     });
 
     socket.on('status', function (msg) {
         console.log(msg.message);
     });
+
+    function updatePredictions(predictionPercentages) {
+        // Assuming the order is ['Forward', 'Land', 'Takeoff', 'Backward', 'Left', 'Right']
+        var labels = ['forward', 'land', 'takeoff', 'backward', 'left', 'right'];
+        for (let label of labels) {
+            console.log(label);
+            console.log(predictionPercentages);
+            console.log(predictionPercentages[label]);
+            var progressBar = document.getElementById('prediction-' + label);
+            progressBar.style.width = predictionPercentages[label] * 100 + '%';
+            progressBar.textContent = predictionPercentages[label] * 100 + '%';
+        }
+    }
 </script>
 </body>
 </html>

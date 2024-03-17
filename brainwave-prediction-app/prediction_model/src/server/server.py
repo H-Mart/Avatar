@@ -2,14 +2,13 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
 import time
-import json
 
-from ..brain_reading import models
+from ..brain_reading import predictions
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-predictor = models.Predictor(125, 1)
+predictor = predictions.Predictor(125, .25)
 
 
 @app.route('/')
@@ -35,9 +34,9 @@ def stop_predicting():
 
 def background_thread():
     while not predictor.stop_event.is_set():
-        time.sleep(.5)
+        time.sleep(.1)
         current_prediction = predictor.get_current_prediction()
-        socketio.emit('new_prediction', {'prediction': json.dumps(current_prediction)})
+        socketio.emit('new_prediction', {'prediction': current_prediction})
 
 
 if __name__ == '__main__':
