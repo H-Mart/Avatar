@@ -11,7 +11,6 @@ import concurrent.futures
 
 from ..utils import wait_no_ret, move
 
-# Define categories
 categories = ["backward", "forward", "land", "left", "right", "takeoff"]
 
 

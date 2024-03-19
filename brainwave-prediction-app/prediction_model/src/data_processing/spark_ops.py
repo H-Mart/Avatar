@@ -8,7 +8,7 @@ from .config import spark_timeout, spark_driver_memory, spark_executor_memory, p
 
 
 def build_spark_session() -> pyspark.sql.SparkSession:
-    builder = pyspark.sql.SparkSession.builder.appName("MyApp") \
+    builder = pyspark.sql.SparkSession.builder.master("spark://Henry-Desktop.:7077").appName("MyApp") \
         .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
         .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
         .config('spark.network.timeout', spark_timeout) \
@@ -45,17 +45,23 @@ def df_from_csvs(base_path: pathlib.Path = processed_dir_path) -> pyspark.sql.Da
                       ' Timestamp (Formatted)']
 
     takeoff = spark.read.options(delimiter=',').csv(
-        str(base_path / "takeoff"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "takeoff"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True,
+        recursiveFileLookup=True)
     land_df = spark.read.options(delimiter=',').csv(
-        str(base_path / "land"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "land"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True,
+        recursiveFileLookup=True)
     left_df = spark.read.options(delimiter=',').csv(
-        str(base_path / "left"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "left"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True,
+        recursiveFileLookup=True)
     right_df = spark.read.options(delimiter=',').csv(
-        str(base_path / "right"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "right"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True,
+        recursiveFileLookup=True)
     forward = spark.read.options(delimiter=',').csv(
-        str(base_path / "forward"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "forward"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True,
+        recursiveFileLookup=True)
     backward = spark.read.options(delimiter=',').csv(
-        str(base_path / "backward"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True)
+        str(base_path / "backward"), inferSchema=True, pathGlobFilter=path_glob_filter, header=True,
+        recursiveFileLookup=True)
 
     # Add labels to the data
     labels = ['takeoff', 'land', 'left', 'right', 'forward', 'backward']

@@ -24,7 +24,8 @@ class TrainTestData:
     X_test: Any
     y_train: Any
     y_test: Any
-    label_map: Any
+    int_to_class_map: Any
+    class_to_int_map: Any
 
 
 def ready_data(table_path: Path = config.deltalake_table_path) -> TrainTestData:
@@ -33,13 +34,17 @@ def ready_data(table_path: Path = config.deltalake_table_path) -> TrainTestData:
     label = 'label'
     classes = pdf[label].unique().tolist()
     pdf[label] = pdf[label].map(classes.index)  # .astype(np.float64)
+    pdf[' Timestamp'] = 0
+    print(classes)
+    print(np.unique(pdf[label], return_counts=True))
 
     X = pdf.drop(columns=[label, 'filename'])
     y = pdf[label]
 
-    label_map = {classes.index(c): c for c in classes}
+    int_to_class_map = {classes.index(c): c for c in classes}
+    class_to_int_map = {c: classes.index(c) for c in classes}
 
-    return TrainTestData(*train_test_split(X, y, test_size=0.2), label_map)
+    return TrainTestData(*train_test_split(X, y, test_size=0.2), int_to_class_map, class_to_int_map)
 
 
 def save_model(model: RandomForestClassifier, save_path: Path):
@@ -53,7 +58,8 @@ def load_model(save_path: Path) -> RandomForestClassifier:
         return pickle.load(f)
 
 
-def train_model(data: TrainTestData, n_estimators=100, max_depth=16, criterion='gini', save=True, save_name=None,
+def train_model(data: TrainTestData, n_estimators=100, max_depth=16, criterion='gini',
+                save=True, save_name=None, save_path=None,
                 jobs=-1):
     model = RandomForestClassifier(
         n_estimators=n_estimators, max_depth=max_depth, criterion=criterion,
@@ -63,6 +69,7 @@ def train_model(data: TrainTestData, n_estimators=100, max_depth=16, criterion='
 
     if save:
         save_name = save_name or f'{n_estimators}_estimators_{max_depth}_depth_{criterion}.model'
-        save_model(model, config.model_save_dir_path / save_name)
+        save_path = save_path or config.model_save_dir_path / save_name
+        save_model(model, save_path)
 
     return model

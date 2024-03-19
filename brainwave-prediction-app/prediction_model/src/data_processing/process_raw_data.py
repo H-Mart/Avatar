@@ -25,10 +25,13 @@ def extract_zip(zip_path: Path, extract_path: Path):
     print(f'Extracting {zip_path} to {extract_path}')
     start = time()
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        names = zip_ref.filelist
+        names = zip_ref.namelist()
         print(f'Extracting {len(names)} files')
-        futures = [threadpool_executor.submit(zip_ref.extract, name, path=extract_path) for name in names]
-        concurrent.futures.wait(futures)
+        for name in names:
+            zip_ref.extract(name, path=extract_path)
+        # zip_ref.extractall(extract_path)
+        # futures = [threadpool_executor.submit(zip_ref.extract, name, path=extract_path) for name in names]
+        # concurrent.futures.wait(futures)
 
     print(f'Extraction took {time() - start:.2f} seconds')
     print(f'Extraction complete')
