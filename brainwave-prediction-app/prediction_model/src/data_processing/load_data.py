@@ -11,5 +11,5 @@ def load_data(file_path: str) -> pd.DataFrame:
 def load_csvs(file_path: Path) -> pd.DataFrame:
     files = [f for f in file_path.rglob('*.csv')]
     with ProcessPoolExecutor() as executor:
-        master_df = pd.concat(list(executor.map(load_data, files)))
+        master_df = pd.concat(list(executor.map(load_data, files)), ignore_index=True)
     return master_df
