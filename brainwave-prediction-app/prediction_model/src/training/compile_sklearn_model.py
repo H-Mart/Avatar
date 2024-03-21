@@ -33,7 +33,7 @@ def ready_data(table_path: Path = config.deltalake_table_path) -> TrainTestData:
     pdf = df1.toPandas()
     label = 'label'
     classes = pdf[label].unique().tolist()
-    pdf[label] = pdf[label].map(classes.index)  # .astype(np.float64)
+    pdf[label] = pdf[label].map(classes.index)
     pdf[' Timestamp'] = 0
     print(classes)
     print(np.unique(pdf[label], return_counts=True))

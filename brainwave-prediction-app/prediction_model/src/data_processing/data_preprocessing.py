@@ -15,10 +15,10 @@ def apply_filters(df: pd.DataFrame,
         return pd.Series(series_np)
 
     df_copy = df.copy()
-
-    cols = [str(x) for x in df_copy.columns if x.startswith(' EXG')]
-
-    df_copy[cols] = df_copy[cols].apply(do_filter)
+    cols1 = [str(x) for x in df_copy.columns if x.startswith(' EXG')]
+    cols_df = df_copy[cols1]
+    cols_df.apply(do_filter)
+    df_copy[cols1] = cols_df
 
     return df_copy
 

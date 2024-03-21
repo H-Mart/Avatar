@@ -55,3 +55,10 @@ array[32] of doubles:
         Aux Data Bytes 27-32: 6 bytes of data
         Byte 33: 0xCX where X is 0-F in hex
 */
+
+TODO
+https://scikit-learn.org/stable/modules/cross_validation.html#group-k-fold
+look into this for cross validation
+GroupKFold
+LeavePGroupsOut
+TimeSeriesSplit
