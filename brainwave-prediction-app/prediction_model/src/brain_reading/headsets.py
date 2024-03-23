@@ -2,16 +2,14 @@ from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds
 from threading import Event, Thread
 
 from ..data_processing import config
-from collections import Counter
 import time
 import numpy as np
 import pandas as pd
 import socket
 import struct
-from pathlib import Path
 from os import environ
 
-RELEVANT_COLS = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 30)
+RELEVANT_COLS = np.arange(32)
 
 start_time = time.time()
 
@@ -32,7 +30,7 @@ class HeadsetStreamer:
         self.e = Event()
 
     def wait(self):
-        time.sleep(.1)
+        time.sleep(.05)
 
     def start_stream(self, event: Event = None):
         # blocks thread until event is set
@@ -149,7 +147,7 @@ class SimHeadsetStreamer(HeadsetStreamer):
                         self.sock.sendto(self.package_buffer.tobytes(), (self.ip, self.port))
                         buf_idx = 0
 
-                    # self.data_array[data_idx, 30] = time.time()
+                    self.data_array[data_idx, 30] = time.time()  # modify timestamp
                     self.package_buffer[buf_idx:buf_idx + 32] = self.data_array[data_idx]
                     buf_idx += 32
                     if buf_idx == len(self.package_buffer):
@@ -183,6 +181,7 @@ class SimHeadsetStreamer(HeadsetStreamer):
                 df.drop(columns=df.columns[-1], inplace=True)  # drop the formatted timestamp column
                 df['label'] = label
                 df['file'] = file
+                # df[' Timestamp']
                 dfs.append(df)
             return pd.concat(dfs)
 
