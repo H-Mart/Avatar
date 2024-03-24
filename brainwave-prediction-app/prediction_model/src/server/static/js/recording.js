@@ -5,7 +5,10 @@ class InstructionStateMachine {
         this.instructions = [];
         this.countdownTime = 5;
         this.recordingTime = 15;
+        this.numRounds = 5;
         this.currentInstructionIndex = 0;
+        this.currentRound = 0;
+        this.session = new Date().getTime();
         this.bindElements();
         this.bindEvents();
         this.showConfigScreen();
@@ -71,6 +74,7 @@ class InstructionStateMachine {
 
         this.countdownTime = document.getElementById('countdownLength').value || 5;
         this.recordingTime = document.getElementById('recordingTime').value || 15;
+        this.numRounds = document.getElementById('numberOfRounds').value || 5;
 
         if (this.instructions.length > 0) {
             this.configScreen.style.display = 'none';
@@ -119,7 +123,7 @@ class InstructionStateMachine {
         this.countdownDisplay.style.display = 'flex';
         this.instructionDisplay.style.display = 'none';
         const countdownInterval = setInterval(() => {
-            this.countdownDisplay.textContent = `Starting in ${countdownTime--} seconds`;
+            this.countdownDisplay.textContent = `Starting in ${--countdownTime} seconds`;
             if (countdownTime < 0) {
                 clearInterval(countdownInterval);
                 this.transition('Instruction');
@@ -132,12 +136,23 @@ class InstructionStateMachine {
         this.instructionDisplay.style.display = 'flex';
         const instruction = this.instructions[this.currentInstructionIndex];
         this.instructionDisplay.textContent = instruction.text;
-        this.socket.emit('start_recording', {instruction, duration: this.recordingTime});
+        this.socket.emit('start_recording', {
+            instruction,
+            duration: this.recordingTime,
+            round: this.currentRound,
+            session: this.session
+        });
 
         this.socket.once('stop_recording', () => {
             this.currentInstructionIndex++;
             if (this.currentInstructionIndex < this.instructions.length) {
                 this.transition('Countdown');
+            } else if (++this.currentRound < this.numRounds) {
+                this.instructionDisplay.textContent = 'Round completed. Get ready for the next round.';
+                setTimeout(() => { ,
+                    this.currentInstructionIndex = 0;
+                    this.transition('Countdown');
+                }, 1000);
             } else {
                 this.transition('Done');
             }
@@ -148,6 +163,7 @@ class InstructionStateMachine {
         this.instructionDisplay.textContent = '';
         this.currentState = 'Configuration';
         this.currentInstructionIndex = 0; // Reset for a new run
+        this.currentRound = 0; // Reset for a new run
         // Optionally, you can add a "Done" message before showing the config screen again
         alert("All instructions completed. Configure for a new run.");
         this.transition('Configuration');
