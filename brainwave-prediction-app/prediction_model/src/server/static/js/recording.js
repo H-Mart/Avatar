@@ -149,7 +149,7 @@ class InstructionStateMachine {
                 this.transition('Countdown');
             } else if (++this.currentRound < this.numRounds) {
                 this.instructionDisplay.textContent = 'Round completed. Get ready for the next round.';
-                setTimeout(() => { ,
+                setTimeout(() => {
                     this.currentInstructionIndex = 0;
                     this.transition('Countdown');
                 }, 1000);
