@@ -27,16 +27,18 @@ def predict():
 
 @socketio.on('start_recording')
 def start_recording(data):
-    print('Starting recording')
+    # print('Starting recording')
+    # print(f'Duration: {duration}')
+    # print(f'Instruction: {instruction}')
     instruction = data['instruction']
-    print(f'Instruction: {instruction}')
     duration = data['duration']
-    print(f'Duration: {duration}')
     label = instruction['label']
-    socketio.start_background_task(wait_for_recording, int(duration), label)
+    session = data['session']
+    round = data['round']
+    socketio.start_background_task(wait_for_recording, int(duration), label, session, round)
 
 
-def wait_for_recording(duration: int, label):
+def wait_for_recording(duration: int, label, session, round):
     df = recorder.record(duration, label)
     print('Recording complete')
     print(f'lag: {time.time() - df.loc[df.index[0], " Timestamp"]}')
@@ -45,4 +47,4 @@ def wait_for_recording(duration: int, label):
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True, use_reloader=False)
+    socketio.run(app, debug=True, host='0.0.0.0', port=8080, allow_unsafe_werkzeug=True, use_reloader=False)
