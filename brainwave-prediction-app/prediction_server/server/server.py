@@ -5,7 +5,6 @@ import tensorflow as tf
 import numpy as np
 import tensorflow_decision_forests as tfdf
 
-
 new_model = tf.keras.models.load_model(
     "../will_modelv3")
 prediction_cache = []
@@ -21,7 +20,6 @@ def index():
 
 @app.route('/eegrandomforestprediction', methods=['POST'])
 def eegprediction():
-
     # import and process the data to feed to ML model
     data = request.data
     dict = json.loads(data)

@@ -3,14 +3,14 @@ import numpy as np
 import pandas as pd
 import requests
 from brainflow.board_shim import BoardShim, BrainFlowInputParams, LogLevels, BoardIds
-from brainflow.data_filter import DataFilter
 
 
-class bciConnection():
+class BCIConnection:
+
+    def __init__(self):
+        self.column_labels = None
 
     def read_from_board(self):
-
-        # print(BoardIds.CYTON_BOARD.value)
 
         # use synthetic board for demo
         # params = BrainFlowInputParams()
@@ -31,7 +31,6 @@ class bciConnection():
         return data
 
     def send_data_to_server(self, data):
-        # eeg_channels = BoardShim.get_eeg_channels(BoardIds.SYNTHETIC_BOARD.value)
         print('Transposed Data From the Board')
         df = pd.DataFrame(np.transpose(data), columns=self.column_labels)
 
@@ -47,7 +46,7 @@ class bciConnection():
         response = requests.post(url, data=data_json, headers=headers)
         return response
 
-    def bciConnectionController(self):
+    def bci_connection_controller(self):
         try:
             BoardShim.enable_dev_board_logger()
 
@@ -61,27 +60,11 @@ class bciConnection():
             data = self.read_from_board()
             # Sends preprocessed data via http request to get a prediction
             server_response = self.send_data_to_server(data)
-
-            if server_response.status_code == 200:  # if a prediction is returned
-                print(server_response.json())
-                return server_response.json()
-                # return prediction
-            else:  # there was in error in getting a thought prediction response
-                # return error
-                print(server_response.status_code)
+            server_response.raise_for_status()
+            return server_response.json()
+        except requests.exceptions.HTTPError as http_err:
+            print(f'HTTP error occurred: {http_err}')
+            print(f'Status Code: {http_err.response.status_code}')
         except Exception as e:
+            print("Non-http error occurred during EEG data collection or transmission")
             print(e)
-            print(server_response.status_code)
-            print("Error Occured during EEG data collection or transmission")
-
-        # demo for data serialization using brainflow API, we recommend to use it instead pandas.to_csv()
-        # DataFilter.write_file(data, 'test.csv', 'w')  # use 'a' for append mode
-        # restored_data = DataFilter.read_file('test.csv')
-        # restored_df = pd.DataFrame(np.transpose(restored_data))
-        # print('Data From the File')
-        # print(restored_df.head(10))
-
-
-if __name__ == "__main__":
-    bcicon = bciConnection()
-    bcicon.bciConnectionController()

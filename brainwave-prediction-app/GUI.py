@@ -1,8 +1,7 @@
 import PySimpleGUI as sg
 import time
-import random
 import cv2
-from client.brainflow1 import bciConnection
+from client.brainflow1 import BCIConnection
 
 from gui_windows.manual_drone_control_window import Drone_Control
 from gui_windows.brainwave_prediction_window import Brainwaves
@@ -88,8 +87,8 @@ def drone_holding_pattern():
 
 def use_brainflow():
     # Create BCI object
-    bci = bciConnection()
-    server_response = bci.bciConnectionController()
+    bci = BCIConnection()
+    server_response = bci.bci_connection_controller()
     return server_response
 
 
