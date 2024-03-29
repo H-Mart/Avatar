@@ -1,0 +1,8 @@
+brainflow
+pysimplegui
+opencv-python
+pysftp
+requests
+numpy
+pandas
+djitellopy

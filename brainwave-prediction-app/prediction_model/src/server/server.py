@@ -9,7 +9,6 @@ from ..data_processing import config
 app = Flask(__name__, template_folder='templates', static_folder='static')
 socketio = SocketIO(app)
 
-# predictor = predictions.Predictor(125, .25)
 recorder = recorder.BrainwaveRecorder(125, 'recordings')
 sim_headset = headsets.SyntheticHeadsetStreamer(config.headset_streaming_host, config.headset_streaming_port)
 socketio.start_background_task(sim_headset.start_stream)
@@ -27,23 +26,28 @@ def predict():
 
 @socketio.on('start_recording')
 def start_recording(data):
-    # print('Starting recording')
-    # print(f'Duration: {duration}')
-    # print(f'Instruction: {instruction}')
+    print(f'Starting recording for {data}')
     instruction = data['instruction']
     duration = data['duration']
     label = instruction['label']
     session = data['session']
-    round = data['round']
-    socketio.start_background_task(wait_for_recording, int(duration), label, session, round)
+    round_num = data['round']
+    socketio.start_background_task(wait_for_recording, int(duration), label, session, round_num)
+
+
+@socketio.on('cancel_recording')
+def cancel_recording():
+    recorder.cancel_recording()
+    socketio.emit('cancel_success')
 
 
 def wait_for_recording(duration: int, label, session, round):
-    df = recorder.record(duration, label)
+    df = recorder.record(duration, label, session=session, round=round)
     print('Recording complete')
     print(f'lag: {time.time() - df.loc[df.index[0], " Timestamp"]}')
     print(df.loc[df.index[-1], ' Timestamp'] - df.loc[0, ' Timestamp'])
-    socketio.emit('stop_recording')
+    if not recorder.cancelled:
+        socketio.emit('stop_recording')
 
 
 if __name__ == '__main__':

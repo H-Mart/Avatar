@@ -30,6 +30,18 @@ class Receiver:
 
         self.stop_event = Event()
 
+    def __enter__(self):
+        self.stop_event.clear()
+        gen = self.generator()
+        next(gen)
+        return gen
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop_event.set()
+
+    def stop(self):
+        self.stop_event.set()
+
     def generator(self):
         while not self.stop_event.is_set():
             new_data = None

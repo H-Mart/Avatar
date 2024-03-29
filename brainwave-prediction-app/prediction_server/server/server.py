@@ -43,7 +43,7 @@ def eegprediction():
 
 
 @app.route('/lastprediction', methods=['GET'])
-def lastprediction():
+def last_prediction():
     try:
         if prediction_cache:
             return {"prediction_label": str(prediction_cache[-1]), "prediction_count": len(prediction_cache)}

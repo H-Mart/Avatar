@@ -6,34 +6,33 @@ from brainflow.board_shim import BoardShim, BrainFlowInputParams, LogLevels, Boa
 
 
 class BCIConnection:
-
-    def __init__(self):
+    def __init__(self, ip: str = '225.1.1.1', port: int = 6677):
         self.column_labels = None
 
-    def read_from_board(self):
-
-        # use synthetic board for demo
         # params = BrainFlowInputParams()
         # params.serial_port = "/dev/cu.usbserial-D200PMA1"
         # board = BoardShim(BoardIds.CYTON_DAISY_BOARD.value, params)
 
         params = BrainFlowInputParams()
-        board = BoardShim(BoardIds.SYNTHETIC_BOARD.value, params)
+        self.board = BoardShim(BoardIds.SYNTHETIC_BOARD.value, params)
 
-        board.prepare_session()
-        board.start_stream(streamer_params="streaming_board://225.1.1.1:6677")
-        BoardShim.log_message(LogLevels.LEVEL_INFO,
-                              'start sleeping in the main thread')
+        self.ip = ip
+        self.port = port
+
+    def read_from_board(self):
+        self.board.prepare_session()
+        self.board.start_stream(streamer_params=f"streaming_board://{self.ip}:{self.port}")
+        BoardShim.log_message(LogLevels.LEVEL_INFO, 'start sleeping in the main thread')
+
         time.sleep(10)
-        data = board.get_board_data()
-        board.stop_stream()
-        board.release_session()
+        data = self.board.get_board_data()
+        self.board.stop_stream()
+        self.board.release_session()
         return data
 
-    def send_data_to_server(self, data):
-        print('Transposed Data From the Board')
-        df = pd.DataFrame(np.transpose(data), columns=self.column_labels)
-
+    def send_data_to_server(self, data, preprocessor=None):
+        # todo make this work with our model
+        df = pd.DataFrame(data, columns=self.column_labels)
         data_json = df.to_json()
 
         # Define the API endpoint URL
@@ -50,7 +49,7 @@ class BCIConnection:
         try:
             BoardShim.enable_dev_board_logger()
 
-            # format data cols.
+            # format data cols
             self.column_labels = []
             for num in range(32):
                 self.column_labels.append("c" + str(num))
@@ -58,7 +57,6 @@ class BCIConnection:
             # read eeg data from the board -- will start a bci session with your current board
             # allowing it to stream to BCI Gui App and collect 10 second data sample
             data = self.read_from_board()
-            # Sends preprocessed data via http request to get a prediction
             server_response = self.send_data_to_server(data)
             server_response.raise_for_status()
             return server_response.json()

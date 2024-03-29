@@ -1,40 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <title>Instruction Cycle with Configuration</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-<div id="configScreen">
-    <label for="numberOfRounds">Number of Rounds:
-    <input type="number" id="numberOfRounds" min="1"/></label>
+<div class="container mt-5">
+    <div id="configScreen" class="container w-75">
+        <div class="card mb-5">
+            <div class="card-header card-header d-flex justify-content-between align-items-center">
+                Configuration
+                <button id="startConfig" class="btn btn-outline-success mx-2">Start Recording</button>
 
-    <label for="roundLength">Countdown Time (s):
-    <input type="number" id="countdownLength" min="1"/></label>
+            </div>
+            <div class="card-body">
+                <!-- Number of Rounds Input -->
+                <div class="input-group mb-3">
+                    <label for="numberOfRounds" class="input-group-text w-25">Number of Rounds</label>
+                    <input type="number" class="form-control" id="numberOfRounds"
+                           placeholder="Enter number of rounds" min="1">
+                </div>
 
-    <label for="recordingTime">Recording Time (s):
-    <input type="number" id="recordingTime" min="1"/></label>
+                <!-- Countdown Length Input -->
+                <div class="input-group mb-3">
+                    <label for="countdownLength" class="input-group-text w-25">Countdown Length (s)</label>
+                    <input type="number" class="form-control" id="countdownLength"
+                           placeholder="Enter countdown length in seconds" min="1">
+                </div>
 
-    <div id="instructionsContainer">
-        <div class="instructionInput">
-            <label for="instructionText">Instruction Text</label>
-            <input type="text" placeholder="Instruction Text">
-            <label for="instructionLabel">Instruction Label</label>
-            <input type="text" placeholder="Instruction Label">
+                <!-- Recording Time Input -->
+                <div class="input-group mb-3">
+                    <label for="recordingTime" class="input-group-text w-25">Recording Time (s)</label>
+                    <input type="number" class="form-control" id="recordingTime"
+                           placeholder="Enter recording time in seconds" min="1">
+                </div>
+            </div>
         </div>
-        <button id="addInstruction">Add Instruction</button>
-    </div>
-    <button id="startConfig">Start</button>
-</div>
 
-<div id="app" style="display: none;">
-    <button id="startButton" style="display: none;">Start</button>
-    <div id="countdown"></div>
-    <div id="instruction"></div>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                Instructions
+                <div>
+                    <button id="addInstruction" class="btn btn-outline-primary mx-2">Add Instruction</button>
+                    <button id="clearInstructions" class="btn btn-outline-danger mx-2">Clear Instructions</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="instructionsContainer" class="container mb-3 justify-content-center">
+                    <div class="row justify-content-evenly">
+                        <div class="col-6"><p class="text-center h4 bg-primary-subtle py-1">Text</p></div>
+                        <div class="col-6"><p class="text-center h4 bg-primary-subtle py-1">Label</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="recordingScreen" class="container d-block d-none">
+        <div class="w-100 justify-content-end d-flex pt-3">
+            <button id="startButton" class="btn btn-lg btn-outline-success mx-2">Start</button>
+            <button id="cancelBtn" class="btn btn-lg btn-outline-danger mx-2">Cancel</button>
+        </div>
+
+        <div style="height: 300px">
+            <div id="readyScreen" class="container d-flex justify-content-center align-items-center h-100">
+                <div class="text-center">
+                    <p class="display-2 my-3">Ready to start?</p>
+                </div>
+            </div>
+
+            <div id="countdownScreen" class="container d-flex justify-content-center align-items-center h-100">
+                <div class="text-center">
+                    <div id="countdownDisplay" class="container">
+                        <div id="countdownMessage" class="display-2 my-3">Next Instruction In</div>
+                        <div id="countdownTimer" class="display-2 my-2">X</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="instructionScreen" class="container d-flex justify-content-center align-items-center h-100">
+                <div class="text-center">
+                    <div id="instructionDisplay" class="display-2 my-3">Example Instruction</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="completeScreen" class="container mt-5 d-flex align-items-center justify-content-center d-none">
+        <div class="text-center">
+            <button id="sameSessionBtn" class="btn btn-lg btn-primary">Restart (same session)</button>
+            <button id="newSessionBtn" class="btn btn-lg btn-primary">Restart (new session)</button>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/recording.js') }}"></script>
 </body>
 </html>

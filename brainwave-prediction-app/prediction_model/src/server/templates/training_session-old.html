@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Instruction Cycle with Configuration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div id="configScreen">
+    <label for="numberOfRounds">Number of Rounds:
+    <input type="number" id="numberOfRounds" min="1"/></label>
+
+    <label for="roundLength">Countdown Time (s):
+    <input type="number" id="countdownLength" min="1"/></label>
+
+    <label for="recordingTime">Recording Time (s):
+    <input type="number" id="recordingTime" min="1"/></label>
+
+    <div id="instructionsContainer">
+        <div class="instructionInput">
+            <label for="instructionText">Instruction Text</label>
+            <input type="text" placeholder="Instruction Text">
+            <label for="instructionLabel">Instruction Label</label>
+            <input type="text" placeholder="Instruction Label">
+        </div>
+        <button id="addInstruction">Add Instruction</button>
+    </div>
+    <button id="startConfig">Start</button>
+</div>
+
+<div id="app" style="display: none;">
+    <button id="startButton" style="display: none;">Start</button>
+    <div id="countdown"></div>
+    <div id="instruction"></div>
+</div>
+
+<script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/recording.js') }}"></script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 import pysftp
 import sys
 
-#this file is expected to be modifed once for every single chromebook in our BCI lab
+
+# this file is expected to be modified once for every single chromebook in our BCI lab
 class fileTransfer:
     def __init__(self, host='', username='', private_key='', private_key_pass='', ignore_host_key=False):
         self.host = host  # change
@@ -15,7 +16,6 @@ class fileTransfer:
         """Connects to the sftp server and returns the sftp connection object"""
         try:
             cnopts = None
-
             if ignore_host_key:
                 cnopts = pysftp.CnOpts()
                 cnopts.hostkeys = None
@@ -29,7 +29,7 @@ class fileTransfer:
                 port=self.port,
                 cnopts=cnopts
             )
-            if (serverconn):
+            if serverconn:
                 print("Connected to host...")
         except Exception as err:
             print(err)
@@ -39,11 +39,11 @@ class fileTransfer:
             return serverconn
 
     def transfer(self, src, target):
-        """Recursivily places files in the target dir, copies everything inside of src dir"""
+        """Recursively places files in the target dir, copies everything inside of src dir"""
         try:
-            print(f"Transfering files to {self.host} ...")
+            print(f"Transferring files to {self.host} ...")
             self.serverconn.put_r(str(src), str(target))
-            print("Files Successfully Transfered!")
+            print("Files Successfully Transferred!")
             print(
                 f"Src files placed in Dir: {self.serverconn.listdir(target)}")
 
@@ -55,7 +55,7 @@ def main():
     svrcon = fileTransfer()
     src = sys.argv[1]
     target = sys.argv[2]
-    svrcon.transfer(str(src), (target))
+    svrcon.transfer(str(src), target)
 
 
 if __name__ == '__main__':

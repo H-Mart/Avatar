@@ -82,9 +82,6 @@ class SimHeadsetStreamer(HeadsetStreamer):
             self.files = np.array(sorted([(p.relative_to(config.set_aside_path).parents[-2].name, p)
                                           for p in
                                           config.set_aside_path.glob('**/*.csv')]))
-            # self.files = np.array(sorted([(p.relative_to(config.processed_minus_set_aside).parents[-2].name, p)
-            #                               for p in
-            #                               config.processed_minus_set_aside.glob('**/*.csv')]))
 
             self.df = None
             self.data_array = None
@@ -181,7 +178,6 @@ class SimHeadsetStreamer(HeadsetStreamer):
                 df.drop(columns=df.columns[-1], inplace=True)  # drop the formatted timestamp column
                 df['label'] = label
                 df['file'] = file
-                # df[' Timestamp']
                 dfs.append(df)
             return pd.concat(dfs)
 
