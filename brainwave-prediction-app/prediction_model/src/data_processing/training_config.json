@@ -1,7 +1,7 @@
 {
   "data_paths": {
-    "compressed_raw": "/mnt/i/bci_data/brainwave_rawdata.zip",
-    "base": "/mnt/i/bci_data/",
+    "compressed_raw": "/home/henry/School/csci495/bci_data/brainwave_rawdata.zip",
+    "base": "/home/henry/School/csci495/bci_data/",
     "raw": "brainwave_rawdata",
     "processed": "brainwave_processed",
     "filtered": "brainwave_filtered",
@@ -22,7 +22,7 @@
     "timeout": "800s"
   },
   "models": {
-    "save_directory": "/mnt/i/bci_data/saved_models",
+    "save_directory": "/home/henry/School/csci495/bci_data/saved_models",
     "stats": "/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/prediction_model/model_stats"
   },
   "training": {

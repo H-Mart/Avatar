@@ -85,38 +85,6 @@ def process_files(raw_path: Path, processed_path: Path):
     raw_path.rmdir()
 
 
-def set_aside_files(raw_path: Path, set_aside_percent=0.2):
-    print(f'Setting aside {set_aside_percent * 100}% of files from {raw_path}')
-    actual_raw_path = raw_path / 'brainwave_rawdata'
-    check_extraction(raw_path)
-
-    to_set_aside = []
-    for category in actual_raw_path.iterdir():
-        to_set_aside.extend(
-            random.sample(list(category.iterdir()), int(len(list(category.iterdir())) * set_aside_percent)))
-
-    futures = [threadpool_executor.submit(utils.move, item, set_aside_path / item.parent.name / item.name)
-               for item in to_set_aside]
-    concurrent.futures.wait(futures)
-
-    convert_files_to_csv.run(set_aside_path.absolute())
-
-
-def filter_files(processed_path: Path, filtered_path: Path):
-    print(f'Filtering files from {processed_path} to {filtered_path}')
-    files = []
-    for category in processed_path.iterdir():
-        for file in category.iterdir():
-            filtered_file_path = filtered_path / category.name / file.name
-            filtered_file_path.parent.mkdir(parents=True, exist_ok=True)
-            files.append((file, filtered_file_path))
-
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = [executor.submit(data_preprocessing.filter_file, file, filtered_file)
-                   for file, filtered_file in files]
-        concurrent.futures.wait(futures)
-
-
 def clear_directory(directory: Path):
     for f in directory.iterdir():
         shutil.rmtree(f)
@@ -147,7 +115,6 @@ def run():
     extract_zip(zip_path, extract_dir_path)
     remove_non_txt_files(extract_dir_path)
     process_files(extract_dir_path, processed_dir_path)
-    # filter_files(processed_dir_path, filtered_dir_path)
 
 
 if __name__ == "__main__":

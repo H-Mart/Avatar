@@ -6,13 +6,14 @@ import sys
 from .bci_gui_tab import BCIGuiTab
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "file-transfer"))
+# noinspection PyUnresolvedReferences
 from sftp import fileTransfer
 
 config = configparser.ConfigParser()  # Used for saving and loading login data for the target
 config.optionxform = str  # Make the saved keys case-sensitive
 
 
-class TransferData(BCIGuiTab):
+class TransferDataTab(BCIGuiTab):
     def __init__(self, name: str = 'Transfer Data'):
         self.name = name
 
@@ -20,7 +21,7 @@ class TransferData(BCIGuiTab):
     def tab_name(self) -> str:
         return self.name
 
-    def get_window(self):
+    def get_tab(self):
         column_to_be_centered = [
             [sg.Text("Target IP:")],
             [sg.InputText(key=self.key("-HOST-"), enable_events=True)],
@@ -45,7 +46,7 @@ class TransferData(BCIGuiTab):
         tab = sg.Tab(self.name, layout, self.name)
         return tab
 
-    def button_loop(self, window, event, values):
+    def handle_event(self, window, event, values):
         if event == "Upload":
             try:
                 # Attempt to open a server connection

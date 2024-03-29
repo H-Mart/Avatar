@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 from PySimpleGUI import Window, Tab
 
 
@@ -9,11 +9,11 @@ class BCIGuiTab(ABC):
         pass
 
     @abstractmethod
-    def get_window(self) -> Tab:
+    def get_tab(self) -> Tab:
         pass
 
     @abstractmethod
-    def button_loop(self, window: Window, event, values):
+    def handle_event(self, window: Window, event, values):
         pass
 
     @property

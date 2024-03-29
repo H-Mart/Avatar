@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 
 # changes method layout to class design for retention of data
-class DroneControl(BCIGuiTab):
+class DroneControlTab(BCIGuiTab):
     def __init__(self, get_drone_action, name='Manual Drone Control'):
         self.log_items = []
         self.first_iteration = True
@@ -22,10 +22,10 @@ class DroneControl(BCIGuiTab):
             window[self.key('LOG')].update(values=self.log_items)
             window.refresh()
 
-    # sets the layout and returns a tab for the tabgroup
-    def get_window(self):
+    def get_tab(self):
         # Define the layout for the Manual Drone Control Page
-        # NEW CHANGES: Added expand_x and expand_y parameters so elements scale with the window, should scale, but buttons are misaligned.
+        # NEW CHANGES: Added expand_x and expand_y parameters so elements scale with the window,
+        # should scale, but buttons are misaligned.
         top_center = [
             [sg.Button('Up', size=(8, 2), expand_x=True, expand_y=True, image_filename="images/up.png")]]
         top_right = [[sg.Text('Flight Log')], [sg.Listbox(
@@ -59,7 +59,7 @@ class DroneControl(BCIGuiTab):
         tab = sg.Tab(self.name, manual_drone_control_layout, key=self.name)
         return tab
 
-    def button_loop(self, window, event, values):
+    def handle_event(self, window, event, values):
         if self.first_iteration:
             self.add_item_to_log("---------- NEW LOG ----------", window=window)
             self.first_iteration = False

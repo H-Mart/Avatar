@@ -1,14 +1,12 @@
 import time
-import numpy as np
 import pandas as pd
 import requests
 from brainflow.board_shim import BoardShim, BrainFlowInputParams, LogLevels, BoardIds
 
 
 class BCIConnection:
-    def __init__(self, ip: str = '225.1.1.1', port: int = 6677):
-        self.column_labels = None
-
+    def __init__(self, headset_ip: str = '225.1.1.1', headset_port: int = 6677,
+                 prediction_server_ip: str = '127.0.0.1', prediction_server_port: int = 5000):
         # params = BrainFlowInputParams()
         # params.serial_port = "/dev/cu.usbserial-D200PMA1"
         # board = BoardShim(BoardIds.CYTON_DAISY_BOARD.value, params)
@@ -16,12 +14,20 @@ class BCIConnection:
         params = BrainFlowInputParams()
         self.board = BoardShim(BoardIds.SYNTHETIC_BOARD.value, params)
 
-        self.ip = ip
-        self.port = port
+        self.headset_ip = headset_ip
+        self.headset_port = headset_port
 
-    def read_from_board(self):
+        self.prediction_server_ip = prediction_server_ip
+        self.prediction_server_port = prediction_server_port
+
+    def _read_from_board(self):
+        """
+        This function will start a bci session with the board and collect 10 seconds of data
+        Returns: a 2D numpy array of the data collected
+
+        """
         self.board.prepare_session()
-        self.board.start_stream(streamer_params=f"streaming_board://{self.ip}:{self.port}")
+        self.board.start_stream(streamer_params=f"streaming_board://{self.headset_ip}:{self.headset_port}")
         BoardShim.log_message(LogLevels.LEVEL_INFO, 'start sleeping in the main thread')
 
         time.sleep(10)
@@ -30,34 +36,29 @@ class BCIConnection:
         self.board.release_session()
         return data
 
-    def send_data_to_server(self, data, preprocessor=None):
+    def _send_data_to_server(self, data, preprocessor=None):
+        """
+        This function will send the data to the prediction server in the same format that the board outputs
+        Returns: the response object from the server
+        """
         # todo make this work with our model
-        df = pd.DataFrame(data, columns=self.column_labels)
+        df = pd.DataFrame(data)
         data_json = df.to_json()
 
-        # Define the API endpoint URL
-        url = 'http://127.0.0.1:5000/eegrandomforestprediction'
-
-        # Set the request headers
+        prediction_endpoint_url = f'http://{self.prediction_server_ip}:{self.prediction_server_port}/eegrandomforestprediction'
         headers = {'Content-Type': 'application/json'}
-
-        # Send the POST request with the data in the request body
-        response = requests.post(url, data=data_json, headers=headers)
+        response = requests.post(prediction_endpoint_url, data=data_json, headers=headers)
         return response
 
-    def bci_connection_controller(self):
+    def read_and_transmit_data_from_board(self):
+        """
+        Collects a 10 second sample of EEG data from the board and sends it to the prediction server for labeling
+        Returns: the response from the server
+        """
         try:
             BoardShim.enable_dev_board_logger()
-
-            # format data cols
-            self.column_labels = []
-            for num in range(32):
-                self.column_labels.append("c" + str(num))
-
-            # read eeg data from the board -- will start a bci session with your current board
-            # allowing it to stream to BCI Gui App and collect 10 second data sample
-            data = self.read_from_board()
-            server_response = self.send_data_to_server(data)
+            data = self._read_from_board()
+            server_response = self._send_data_to_server(data)
             server_response.raise_for_status()
             return server_response.json()
         except requests.exceptions.HTTPError as http_err:

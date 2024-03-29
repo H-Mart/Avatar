@@ -5,8 +5,7 @@ import tensorflow as tf
 import numpy as np
 import tensorflow_decision_forests as tfdf
 
-new_model = tf.keras.models.load_model(
-    "../will_modelv3")
+new_model = tf.keras.models.load_model("../will_modelv3")
 prediction_cache = []
 labels = ['backward', 'down', 'forward',
           'land', 'left', 'right', 'takeoff', 'up']

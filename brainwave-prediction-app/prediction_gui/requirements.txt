@@ -3,6 +3,7 @@ pysimplegui
 opencv-python
 pysftp
 requests
-numpy
+numpy==
 pandas
 djitellopy
+tensorflow
