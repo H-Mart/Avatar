@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 import os
 import configparser
 import sys
+from pathlib import Path
 
 from .bci_gui_tab import BCIGuiTab
 
@@ -14,7 +15,7 @@ config.optionxform = str  # Make the saved keys case-sensitive
 
 
 class TransferDataTab(BCIGuiTab):
-    def __init__(self, name: str = 'Transfer Data'):
+    def __init__(self, name: str = 'Transfer Data', image_dir: Path = 'images'):
         self.name = name
 
     @property

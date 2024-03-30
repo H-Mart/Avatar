@@ -1,17 +1,22 @@
 import PySimpleGUI as sg
 
-from gui_windows.manual_drone_control_window import DroneControlTab
-from gui_windows.brainwave_prediction_window import BrainwaveTab
-from gui_windows.transfer_files_window import TransferDataTab
-from gui_windows.bci_gui_tab import BCIGuiTab
+import os
+
+from .gui_windows.manual_drone_control_window import DroneControlTab
+from .gui_windows.brainwave_prediction_window import BrainwaveTab
+from .gui_windows.transfer_files_window import TransferDataTab
+from .gui_windows.bci_gui_tab import BCIGuiTab
+
+from .client import drone
 
 
 def create_tabs() -> dict[str, BCIGuiTab]:
     # the order of the tabs is the order they will appear in the GUI (left to right)
+    image_dir = str(os.path.join(os.path.dirname(__file__), 'images'))
     tabs = [
-        BrainwaveTab(drone_action_func, use_brainflow),
+        BrainwaveTab(image_dir=image_dir),
         TransferDataTab(),
-        DroneControlTab(drone_action_func)
+        DroneControlTab(get_drone_action=drone.execute_drone_action, image_dir=image_dir)
     ]
 
     return {t.name: t for t in tabs}

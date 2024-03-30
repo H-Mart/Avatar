@@ -2,14 +2,17 @@ import PySimpleGUI as sg
 
 from .bci_gui_tab import BCIGuiTab
 
-from ..client.drone import get_drone_action_testing, execute_drone_action
+from ..client.drone import execute_drone_action
 from ..client.bci_connection import BCIConnection
+
+get_drone_action_testing = execute_drone_action
 
 
 # changed script design to class object for variable retention in tabs
 class BrainwaveTab(BCIGuiTab):
-    def __init__(self, name: str = 'Brainwave Reading'):
+    def __init__(self, name: str = 'Brainwave Reading', image_dir: str = 'images'):
         self.name = name
+        self.image_dir = image_dir
 
         self.bci_connection = BCIConnection()
 
@@ -23,11 +26,11 @@ class BrainwaveTab(BCIGuiTab):
         self.prediction_label = None
 
         self.read_my_mind_button = sg.Button('Read my mind...', size=(40, 5),
-                                             image_filename="images/brain.png", key=self.key('read_mind'))
+                                             image_filename=f'{self.image_dir}/brain.png', key=self.key('read_mind'))
         self.not_what_i_was_thinking_button = sg.Button('Not what I was thinking...', size=(14, 3),
                                                         key=self.key('not_thinking'))
         self.execute_button = sg.Button('Execute', size=(14, 3), key=self.key('execute'))
-        self.connect_button = sg.Button('Connect', size=(8, 2), image_filename="images/connect.png",
+        self.connect_button = sg.Button('Connect', size=(8, 2), image_filename=f'{self.image_dir}/connect.png',
                                         key=self.key('connect'))
         self.keep_alive_button = sg.Button('Keep Drone Alive', key=self.key('keep_alive'))
 
@@ -100,24 +103,23 @@ class BrainwaveTab(BCIGuiTab):
         window[self.key('-TABLE-')].update(values=self.predictions_log)
 
     def handle_event(self, window, event, values):
-        prediction_label = None
 
         if event == self.read_my_mind_button.key:
             prediction_response = self.bci_connection.read_and_transmit_data_from_board()
             self.count = prediction_response['prediction_count']
-            prediction_label = prediction_response['prediction_label']
-            self.set_server_table(window, self.count, prediction_label)
+            self.prediction_label = prediction_response['prediction_label']
+            self.set_server_table(window, self.count, self.prediction_label)
 
         elif event == self.not_what_i_was_thinking_button.key:
-            get_drone_action_testing(values['-drone_input-'])
+            # get_drone_action_testing(values['-drone_input-'])
             self.add_to_predictions_log(window, "manual", "predict",
-                                        f"{values['-drone_input-']}")
+                                        f"{self.prediction_label}")
 
         elif event == self.execute_button.key:
-            self.add_to_flight_log(window, prediction_label)
-            get_drone_action_testing(prediction_label)
+            self.add_to_flight_log(window, self.prediction_label)
+            get_drone_action_testing(self.prediction_label)
             self.add_to_flight_log(window, "done")
-            self.add_to_predictions_log(window, len(self.predictions_log) + 1, self.count, prediction_label)
+            self.add_to_predictions_log(window, len(self.predictions_log) + 1, self.count, self.prediction_label)
 
         elif event == self.connect_button.key:
             self.add_to_flight_log(window, "Connect button pressed")

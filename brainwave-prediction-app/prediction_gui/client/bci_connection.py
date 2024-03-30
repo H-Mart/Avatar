@@ -7,12 +7,9 @@ from brainflow.board_shim import BoardShim, BrainFlowInputParams, LogLevels, Boa
 class BCIConnection:
     def __init__(self, headset_ip: str = '225.1.1.1', headset_port: int = 6677,
                  prediction_server_ip: str = '127.0.0.1', prediction_server_port: int = 5000):
-        # params = BrainFlowInputParams()
-        # params.serial_port = "/dev/cu.usbserial-D200PMA1"
-        # board = BoardShim(BoardIds.CYTON_DAISY_BOARD.value, params)
-
         params = BrainFlowInputParams()
-        self.board = BoardShim(BoardIds.SYNTHETIC_BOARD.value, params)
+        params.serial_port = "/dev/ttyUSB0"
+        self.board = BoardShim(BoardIds.CYTON_DAISY_BOARD.value, params)
 
         self.headset_ip = headset_ip
         self.headset_port = headset_port
@@ -27,7 +24,7 @@ class BCIConnection:
 
         """
         self.board.prepare_session()
-        self.board.start_stream(streamer_params=f"streaming_board://{self.headset_ip}:{self.headset_port}")
+        self.board.start_stream()
         BoardShim.log_message(LogLevels.LEVEL_INFO, 'start sleeping in the main thread')
 
         time.sleep(10)

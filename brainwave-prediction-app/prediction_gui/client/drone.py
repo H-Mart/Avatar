@@ -44,35 +44,35 @@ def execute_drone_action(action: str):
             cv2.imshow("drone", img)
     else:
         raise ValueError(f"Action {action} not recognized")
-
-
-def get_drone_action_testing(action):
-    if action == 'connect':
-        print("tello.connect()")
-    elif action == 'backward':
-        print('tello.move_back(30)')
-    elif action == 'down':
-        print('tello.move_down(30)')
-    elif action == 'forward':
-        print('tello.move_forward(30)')
-    elif action == 'land':
-        print('tello.land')
-    elif action == 'left':
-        print('tello.move_left(30)')
-    elif action == 'right':
-        print('tello.move_right(30)')
-    elif action == 'takeoff':
-        print('tello.takeoff')
-    elif action == 'up':
-        print('tello.move_up(30)')
-    elif action == 'turn_left':
-        print('tello.rotate_counter_clockwise(45)')
-    elif action == 'turn_right':
-        print('tello.rotate_clockwise(45)')
-    elif action == 'flip':
-        print("tello.flip('b')")
-    elif action == 'keep alive':
-        print("tello.query_battery()")
-    elif action == 'stream':
-        print("tello.streamon()")
-    return "Done"
+#
+#
+# def get_drone_action_testing(action):
+#     if action == 'connect':
+#         print("tello.connect()")
+#     elif action == 'backward':
+#         print('tello.move_back(30)')
+#     elif action == 'down':
+#         print('tello.move_down(30)')
+#     elif action == 'forward':
+#         print('tello.move_forward(30)')
+#     elif action == 'land':
+#         print('tello.land')
+#     elif action == 'left':
+#         print('tello.move_left(30)')
+#     elif action == 'right':
+#         print('tello.move_right(30)')
+#     elif action == 'takeoff':
+#         print('tello.takeoff')
+#     elif action == 'up':
+#         print('tello.move_up(30)')
+#     elif action == 'turn_left':
+#         print('tello.rotate_counter_clockwise(45)')
+#     elif action == 'turn_right':
+#         print('tello.rotate_clockwise(45)')
+#     elif action == 'flip':
+#         print("tello.flip('b')")
+#     elif action == 'keep alive':
+#         print("tello.query_battery()")
+#     elif action == 'stream':
+#         print("tello.streamon()")
+#     return "Done"

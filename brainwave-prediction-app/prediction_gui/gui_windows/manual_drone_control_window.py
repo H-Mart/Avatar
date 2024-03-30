@@ -1,15 +1,17 @@
 import PySimpleGUI as sg
 from .bci_gui_tab import BCIGuiTab
+from pathlib import Path
 from dataclasses import dataclass
 
 
 # changes method layout to class design for retention of data
 class DroneControlTab(BCIGuiTab):
-    def __init__(self, get_drone_action, name='Manual Drone Control'):
+    def __init__(self, get_drone_action, name='Manual Drone Control', image_dir: str = 'images'):
         self.log_items = []
         self.first_iteration = True
         self.get_drone_action = get_drone_action
         self.name = name
+        self.image_dir = image_dir
 
     @property
     def tab_name(self) -> str:
@@ -26,35 +28,36 @@ class DroneControlTab(BCIGuiTab):
         # Define the layout for the Manual Drone Control Page
         # NEW CHANGES: Added expand_x and expand_y parameters so elements scale with the window,
         # should scale, but buttons are misaligned.
+
         top_center = [
-            [sg.Button('Up', size=(8, 2), expand_x=True, expand_y=True, image_filename="images/up.png")]]
+            [sg.Button('Up', size=(8, 2), expand_x=True, expand_y=True, image_filename=f'{self.image_dir}/up.png')]]
         top_right = [[sg.Text('Flight Log')], [sg.Listbox(
             values=[], size=(40, 5), key=self.key('LOG'))]]
         bottom_center = [
-            [sg.Button('Down', size=(8, 2), expand_x=True, expand_y=True, image_filename="images/down.png")]]
+            [sg.Button('Down', size=(8, 2), expand_x=True, expand_y=True, image_filename=f'{self.image_dir}/down.png')]]
 
         manual_drone_control_layout = [
-            [sg.Button('Home', size=(8, 2), image_filename="images/home.png"),
+            [sg.Button('Home', size=(8, 2), image_filename=f'{self.image_dir}/home.png'),
              sg.Column(top_center, expand_x=True, expand_y=True, pad=((0, 0), (0, 0))), sg.Column(top_right)],
 
             [sg.Button('Forward', size=(8, 2), expand_x=True, expand_y=True,
-                       image_filename="images/forward.png")],
+                       image_filename=f'{self.image_dir}/forward.png')],
 
-            [sg.Button('Turn Left', size=(8, 2), expand_x=True, expand_y=True, image_filename="images/turnLeft.png"),
+            [sg.Button('Turn Left', size=(8, 2), expand_x=True, expand_y=True, image_filename=f'{self.image_dir}/turnLeft.png'),
              sg.Button('Left', size=(8, 2), expand_x=True, expand_y=True,
-                       image_filename="images/left.png"),
-             sg.Button('Stream', expand_x=True, expand_y=True, image_filename="images/drone.png"),
+                       image_filename=f'{self.image_dir}/left.png'),
+             sg.Button('Stream', expand_x=True, expand_y=True, image_filename=f'{self.image_dir}/drone.png'),
              sg.Button('Right', size=(8, 2), expand_x=True, expand_y=True,
-                       image_filename="images/right.png"),
-             sg.Button('Turn Right', size=(8, 2), expand_x=True, expand_y=True, image_filename="images/turnRight.png")],
+                       image_filename=f'{self.image_dir}/right.png'),
+             sg.Button('Turn Right', size=(8, 2), expand_x=True, expand_y=True, image_filename=f'{self.image_dir}/turnRight.png')],
 
             [sg.Button('Back', size=(8, 2), expand_x=True, expand_y=True,
-                       image_filename="images/back.png")],
+                       image_filename=f'{self.image_dir}/back.png')],
 
-            [sg.Button('Connect1', size=(8, 2), image_filename="images/connect.png"),
+            [sg.Button('Connect1', size=(8, 2), image_filename=f'{self.image_dir}/connect.png'),
              sg.Column(bottom_center, expand_x=True, expand_y=True, pad=((0, 0), (0, 0))),
-             sg.Button('Takeoff', size=(8, 2), image_filename="images/takeoff.png"),
-             sg.Button('Land', size=(8, 2), image_filename="images/land.png")]]
+             sg.Button('Takeoff', size=(8, 2), image_filename=f'{self.image_dir}/takeoff.png'),
+             sg.Button('Land', size=(8, 2), image_filename=f'{self.image_dir}/land.png')]]
 
         tab = sg.Tab(self.name, manual_drone_control_layout, key=self.name)
         return tab
@@ -111,4 +114,5 @@ class DroneControlTab(BCIGuiTab):
             self.get_drone_action('connect')
             self.add_item_to_log("Done.", window=window)
         elif event == 'Stream':
-            self.get_drone_action('stream')
+            print('no')
+            # self.get_drone_action('stream')
