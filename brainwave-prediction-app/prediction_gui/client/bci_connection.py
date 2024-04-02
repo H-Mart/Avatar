@@ -33,12 +33,11 @@ class BCIConnection:
         self.board.release_session()
         return data
 
-    def _send_data_to_server(self, data, preprocessor=None):
+    def _send_data_to_server(self, data):
         """
         This function will send the data to the prediction server in the same format that the board outputs
         Returns: the response object from the server
         """
-        # todo make this work with our model
         df = pd.DataFrame(data)
         data_json = df.to_json()
 

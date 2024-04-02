@@ -1,11 +1,13 @@
-# FROM tensorflow/tensorflow:latest-gpu as gpu_build
+FROM python:3.11
+COPY server_requirements.txt /prediction_server/server_requirements.txt
+WORKDIR /prediction_server
 
-FROM python:3.10.1
-COPY server/requirements.txt requirements.txt
-COPY server server
-COPY will_modelv3 will_modelv3
-RUN pip3 install -r requirements.txt
+RUN pip install --upgrade pip
+RUN pip3 install -r server_requirements.txt
+
+COPY ./server /prediction_server/server
+COPY ./models /prediction_server/models
 
 EXPOSE 5000
 
-CMD [ "python3", "server/server.py"]
+CMD ["python", "-m", "server.server"]

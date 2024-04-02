@@ -103,7 +103,6 @@ class BrainwaveTab(BCIGuiTab):
         window[self.key('-TABLE-')].update(values=self.predictions_log)
 
     def handle_event(self, window, event, values):
-
         if event == self.read_my_mind_button.key:
             prediction_response = self.bci_connection.read_and_transmit_data_from_board()
             self.count = prediction_response['prediction_count']
@@ -111,7 +110,6 @@ class BrainwaveTab(BCIGuiTab):
             self.set_server_table(window, self.count, self.prediction_label)
 
         elif event == self.not_what_i_was_thinking_button.key:
-            # get_drone_action_testing(values['-drone_input-'])
             self.add_to_predictions_log(window, "manual", "predict",
                                         f"{self.prediction_label}")
 

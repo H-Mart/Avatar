@@ -3,14 +3,14 @@ import pandas as pd
 import json
 import numpy as np
 import pickle
-from sklearn.ensemble import RandomForestClassifier
+from pathlib import Path
 
 prediction_cache = []
 labels = ['backward', 'down', 'forward',
           'land', 'left', 'right', 'takeoff', 'up']
 app = Flask(__name__)
 
-with open(f'sklearn_naive.skl_model', 'rb') as f:
+with open(f'models/sklearn_naive.skl_model', 'rb') as f:
     model = pickle.load(f)
 
 
