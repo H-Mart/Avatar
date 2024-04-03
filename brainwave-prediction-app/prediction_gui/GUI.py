@@ -7,16 +7,18 @@ from .gui_windows.brainwave_prediction_window import BrainwaveTab
 from .gui_windows.transfer_files_window import TransferDataTab
 from .gui_windows.bci_gui_tab import BCIGuiTab
 
-from .client import drone
+from .client.drone import Drone
+
+drone = Drone(testing=True)
 
 
 def create_tabs() -> dict[str, BCIGuiTab]:
     # the order of the tabs is the order they will appear in the GUI (left to right)
     image_dir = str(os.path.join(os.path.dirname(__file__), 'images'))
     tabs = [
-        BrainwaveTab(image_dir=image_dir),
+        BrainwaveTab(drone, image_dir=image_dir),
         TransferDataTab(),
-        DroneControlTab(get_drone_action=drone.execute_drone_action, image_dir=image_dir)
+        DroneControlTab(drone, image_dir=image_dir)
     ]
 
     return {t.name: t for t in tabs}
@@ -39,13 +41,18 @@ def run_gui():
     window = create_window(tabs)
 
     while True:
-        event, values = window.read()
+        try:
+            event, values = window.read()
 
-        if event == sg.WIN_CLOSED:
-            break
+            if event == sg.WIN_CLOSED:
+                break
+            elif event == 'reading_done':
+                continue
 
-        active_tab = tabs[window['tabgroup'].get()]
-        active_tab.handle_event(window, event, values)
+            active_tab = tabs[window['tabgroup'].get()]
+            active_tab.handle_event(window, event, values)
+        except Exception as e:
+            sg.popup_error(f"An error occurred: {e}")
 
 
 if __name__ == '__main__':

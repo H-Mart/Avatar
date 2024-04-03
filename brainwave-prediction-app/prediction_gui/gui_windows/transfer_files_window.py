@@ -15,7 +15,7 @@ config.optionxform = str  # Make the saved keys case-sensitive
 
 
 class TransferDataTab(BCIGuiTab):
-    def __init__(self, name: str = 'Transfer Data', image_dir: Path = 'images'):
+    def __init__(self, name: str = 'Transfer Data'):
         self.name = name
 
     @property

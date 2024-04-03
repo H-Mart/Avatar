@@ -21,19 +21,21 @@ def index():
 
 @app.route('/eegrandomforestprediction', methods=['POST'])
 def eegprediction():
-    # import and process the data to feed to ML model
-    data = request.data
-    data_dict = json.loads(data)
+    if request.data is None:
+        return {'error': 'No data provided'}
 
-    df = pd.DataFrame.from_dict(data_dict).to_numpy(dtype=np.float64)
-    df = np.transpose(df)[:, 1:17]
+    # import and process the data to feed to ML model
+    data_dict = request.get_json()
+
+    df = pd.DataFrame.from_dict(data_dict, orient='index')
+    np_df = df.to_numpy(dtype=np.float64)[:, 1:17]
 
     # Give to model for it to predict
-    prediction = model.predict(df)
+    prediction = model.predict(np_df)
     pred_labels, pred_label_count = np.unique(prediction, return_counts=True)
     predicted_label = pred_labels[np.argmax(pred_label_count)]
 
-    return {"prediction_label": predicted_label, "prediction_count": len(prediction_cache)}
+    return {'prediction_label': predicted_label, 'prediction_count': len(prediction_cache)}
 
 
 if __name__ == '__main__':
