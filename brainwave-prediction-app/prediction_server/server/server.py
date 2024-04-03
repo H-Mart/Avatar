@@ -8,7 +8,10 @@ from pathlib import Path
 prediction_cache = []
 labels = ['backward', 'down', 'forward',
           'land', 'left', 'right', 'takeoff', 'up']
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
+
+print(Path(app.template_folder).absolute())
+print(list(Path(app.template_folder).rglob('*')))
 
 with open(f'models/sklearn_naive.skl_model', 'rb') as f:
     model = pickle.load(f)
@@ -39,4 +42,4 @@ def eegprediction():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=8000)
