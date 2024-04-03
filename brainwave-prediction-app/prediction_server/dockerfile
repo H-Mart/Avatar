@@ -7,7 +7,10 @@ RUN pip3 install -r server_requirements.txt
 
 COPY ./server /prediction_server/server
 COPY ./models /prediction_server/models
+COPY ./templates /prediction_server/templates
 
-EXPOSE 5000
+EXPOSE 8000
+#WORKDIR /prediction_server/server
+#ENV FLASK_APP=server.py
 
-CMD ["python", "-m", "server.server"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "server.server:app"]
