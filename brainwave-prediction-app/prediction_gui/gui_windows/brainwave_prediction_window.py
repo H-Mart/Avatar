@@ -9,11 +9,12 @@ from ..client.bci_connection import BCIConnection
 
 # changed script design to class object for variable retention in tabs
 class BrainwaveTab(BCIGuiTab):
-    def __init__(self, drone: Drone, name: str = 'Brainwave Reading', image_dir: str = 'images'):
+    def __init__(self, drone: Drone, bci_connection: BCIConnection, name: str = 'Brainwave Reading',
+                 image_dir: str = 'images'):
         self.name = name
         self.image_dir = image_dir
 
-        self.bci_connection = BCIConnection()
+        self.bci_connection = bci_connection
         self.drone = drone
 
         self.flight_log = []  # array to hold flight log info

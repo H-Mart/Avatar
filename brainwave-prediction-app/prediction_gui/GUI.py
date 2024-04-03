@@ -8,15 +8,17 @@ from .gui_windows.transfer_files_window import TransferDataTab
 from .gui_windows.bci_gui_tab import BCIGuiTab
 
 from .client.drone import Drone
-
-drone = Drone(testing=True)
+from .client.bci_connection import BCIConnection
 
 
 def create_tabs() -> dict[str, BCIGuiTab]:
+    drone = Drone(testing=True)
+    bci_connection = BCIConnection(use_fake_bci=True)
+
     # the order of the tabs is the order they will appear in the GUI (left to right)
     image_dir = str(os.path.join(os.path.dirname(__file__), 'images'))
     tabs = [
-        BrainwaveTab(drone, image_dir=image_dir),
+        BrainwaveTab(drone, bci_connection, image_dir=image_dir),
         TransferDataTab(),
         DroneControlTab(drone, image_dir=image_dir)
     ]
@@ -32,7 +34,7 @@ def create_tabgroup_layout(tabs: dict[str, BCIGuiTab]) -> list[list[sg.Element]]
 
 def create_window(tabs: dict[str, BCIGuiTab]) -> sg.Window:
     layout = create_tabgroup_layout(tabs)
-    return sg.Window('Start Page', layout, size=(800, 800), element_justification='c',
+    return sg.Window('Start Page', layout, size=(1000, 1000), element_justification='c',
                      resizable=True, finalize=True)
 
 

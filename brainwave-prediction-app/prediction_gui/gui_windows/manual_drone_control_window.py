@@ -23,7 +23,6 @@ class DroneControlTab(BCIGuiTab):
         if window:
             log = window[self.key('LOG')]
             window[self.key('LOG')].update(value='\n'.join(self.log_items))
-            window.refresh()
 
     def get_tab(self):
         # Define the layout for the Manual Drone Control Page
