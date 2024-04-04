@@ -6,39 +6,42 @@ import tensorflow as tf
 from tensorflow_decision_forests.keras import RandomForestModel
 import numpy as np
 
-# process_raw_data.run()
+if __name__ == '__main__':
 
-start = time()
-df = load_data.load_csvs(processed_dir_path)
-print(f"Time to load data: {time() - start}")
-df.sort_values(by=['session', 'trial', ' Timestamp'], inplace=True)
-cols = [str(x) for x in df.columns if x.startswith(' EXG')]
-labels = ['left', 'right', 'takeoff', 'land', 'forward', 'backward']
+    process_raw_data.run()
 
-df['label'] = df['label'].map(labels.index)
-channel_data = df[cols]
-assert channel_data.shape[1] == 16
-label_data = df['label']
-channel_data = channel_data.to_numpy()
-label_data = label_data.to_numpy()
+    start = time()
+    df = load_data.load_csvs(processed_dir_path)
+    print(f"Time to load data: {time() - start}")
+    exit(1)
+    df.sort_values(by=['session', 'trial', ' Timestamp'], inplace=True)
+    cols = [str(x) for x in df.columns if x.startswith(' EXG')]
+    labels = ['left', 'right', 'takeoff', 'land', 'forward', 'backward']
 
-for i, label in enumerate(labels):
-    label_data[label_data == label] = i
+    df['label'] = df['label'].map(labels.index)
+    channel_data = df[cols]
+    assert channel_data.shape[1] == 16
+    label_data = df['label']
+    channel_data = channel_data.to_numpy()
+    label_data = label_data.to_numpy()
 
-X = channel_data[:, :17].astype(np.float64)
-y = label_data.astype(np.float64)
+    for i, label in enumerate(labels):
+        label_data[label_data == label] = i
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    X = channel_data[:, :17].astype(np.float64)
+    y = label_data.astype(np.float64)
 
-train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train)).batch(100)
-test_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(100)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-model = RandomForestModel(num_trees=100, max_depth=32)
-model.compile(metrics=["accuracy"])
-model.fit(train_dataset)
+    train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train)).batch(100)
+    test_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test)).batch(100)
 
-print(f"Training accuracy: {model.evaluate(train_dataset)}")
-print(f"Testing accuracy: {model.evaluate(test_dataset)}")
+    model = RandomForestModel(num_trees=100, max_depth=32)
+    model.compile(metrics=["accuracy"])
+    model.fit(train_dataset)
 
-# Save the model
-model.save("tensorflow_naive.keras")
+    print(f"Training accuracy: {model.evaluate(train_dataset)}")
+    print(f"Testing accuracy: {model.evaluate(test_dataset)}")
+
+    # Save the model
+    model.save("tensorflow_naive")
