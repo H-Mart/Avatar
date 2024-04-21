@@ -7,13 +7,11 @@ from tensorflow_decision_forests.keras import RandomForestModel
 import numpy as np
 
 if __name__ == '__main__':
-
     process_raw_data.run()
 
     start = time()
     df = load_data.load_csvs(processed_dir_path)
     print(f"Time to load data: {time() - start}")
-    exit(1)
     df.sort_values(by=['session', 'trial', ' Timestamp'], inplace=True)
     cols = [str(x) for x in df.columns if x.startswith(' EXG')]
     labels = ['left', 'right', 'takeoff', 'land', 'forward', 'backward']

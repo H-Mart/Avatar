@@ -197,7 +197,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+
+
     # temp_dir = Path('./temp')
     # temp_dir.mkdir(exist_ok=True)
     #

@@ -41,6 +41,11 @@ def cancel_recording():
     socketio.emit('cancel_success')
 
 
+@socketio.on('start_predicting')
+def start_predicting():
+    pass
+
+
 def wait_for_recording(duration: int, label, session, round):
     df = recorder.record(duration, label, session=session, round=round)
     print('Recording complete')

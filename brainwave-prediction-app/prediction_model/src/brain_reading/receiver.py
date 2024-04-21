@@ -1,4 +1,5 @@
 import numpy as np
+import time
 
 from .headsets import get_listening_socket
 from ..data_processing import config
@@ -22,11 +23,14 @@ columns = ['Sample Index', ' EXG Channel 0', ' EXG Channel 1', ' EXG Channel 2',
 
 
 class Receiver:
-    def __init__(self, sampling_rate, period=1):
+    def __init__(self, sampling_rate):
         self.sock = get_listening_socket(config.headset_streaming_host, config.headset_streaming_port)
         self.sock.setblocking(0)
 
         self.sample_buffer = np.empty(32 * config.brainflow_batch_size, dtype=np.float64)
+
+        self.sampling_rate = sampling_rate
+        self.sample_period = 1 / sampling_rate
 
         self.stop_event = Event()
 
@@ -43,16 +47,33 @@ class Receiver:
         self.stop_event.set()
 
     def generator(self):
+        last_new_data = time.time()
         while not self.stop_event.is_set():
             new_data = None
             while True:
+                last_new_data = time.time()
                 try:
                     nbytes, _ = self.sock.recvfrom_into(self.sample_buffer)
                     new_data = True
                 except BlockingIOError:
+                    # if no new data is available, sleep at the sampling rate
+                    delta = time.time() - last_new_data
+                    if 0 < delta < self.sample_period:
+                        time.sleep(self.sample_period - delta)
                     break
             if new_data:
                 num_rows = nbytes // HEADSET_DATA_LENGTH_BYTES
                 data = (self.sample_buffer[:num_rows * HEADSET_DATA_LENGTH_FLOATS]
                         .reshape((num_rows, HEADSET_DATA_LENGTH_FLOATS))[:, RELEVANT_COLS])
                 yield data
+
+
+if __name__ == '__main__':
+    r = Receiver(125)
+
+    print('starting')
+
+    with r as recv:
+        for sample in recv:
+            print(sample)
+            # break

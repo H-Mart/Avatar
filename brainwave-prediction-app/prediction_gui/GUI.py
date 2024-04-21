@@ -12,8 +12,8 @@ from .client.bci_connection import BCIConnection
 
 
 def create_tabs() -> dict[str, BCIGuiTab]:
-    drone = Drone(testing=True)
-    bci_connection = BCIConnection(use_fake_bci=True)
+    drone = Drone(testing=False)
+    bci_connection = BCIConnection(use_fake_bci=False)
 
     # the order of the tabs is the order they will appear in the GUI (left to right)
     image_dir = str(os.path.join(os.path.dirname(__file__), 'images'))

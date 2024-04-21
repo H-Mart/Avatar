@@ -61,7 +61,7 @@ class Predictor:
             try:
                 nbytes, address = self.sock.recvfrom_into(self.sample_buffer)
             except socket.timeout:
-                print('timeout')
+                print('connection timeout')
                 continue
 
             num_rows = nbytes // HEADSET_DATA_LENGTH_BYTES

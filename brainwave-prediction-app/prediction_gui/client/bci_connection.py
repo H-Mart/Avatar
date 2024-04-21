@@ -24,7 +24,7 @@ class BCIConnection:
         self.prediction_server_url = prediction_server_url
 
         if os.environ.get('BCI_GUI_USE_FAKE_BCI'):
-            use_fake_bci = True
+            use_fake_bci = False # todo change to True
             print('Using fake BCI from environment variable')
         else:
             print(f'Using default fake BCI setting: {use_fake_bci}')

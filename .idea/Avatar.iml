@@ -10,10 +10,12 @@
       <excludeFolder url="file://$MODULE_DIR$/.idea/copilot/chatSessions" />
       <excludeFolder url="file://$MODULE_DIR$/gui_venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.11 (Avatar)" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="bootstrap" level="application" />
     <orderEntry type="library" name="socket.io" level="application" />
+    <orderEntry type="library" name="socket.io" level="application" />
+    <orderEntry type="library" name="bootstrap" level="application" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="versionSpecifier" value="Don't specify version" />

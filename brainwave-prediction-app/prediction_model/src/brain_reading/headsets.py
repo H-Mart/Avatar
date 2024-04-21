@@ -187,6 +187,7 @@ class SimHeadsetStreamer(HeadsetStreamer):
 
 
 def get_listening_socket(ip: str, port: int) -> socket.socket:
+    print(f'listening on {ip}:{port}')
     # Create a UDP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
