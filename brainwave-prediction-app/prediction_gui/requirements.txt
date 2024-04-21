@@ -1,7 +1,0 @@
-brainflow
-pysftp
-requests
-pandas
-djitellopy
-pysimplegui
-

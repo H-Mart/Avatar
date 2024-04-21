@@ -1,0 +1,4 @@
+1. setup training of model using recorded data
+2. integrate model into the server
+3. update index.html to display the model output
+4. hope it works ;)

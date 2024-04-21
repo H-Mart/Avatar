@@ -43,8 +43,15 @@ class BrainwaveTab(BCIGuiTab):
     # changed the method to return a tab for the tabgroup
     def get_tab(self):
         top_left = [
-            [sg.Radio('Manual Control', 'pilot', default=True, size=(-20, 1)),
-             sg.Radio('Autopilot', 'pilot', size=(12, 1))],
+            [sg.Radio('Manual Control', 'pilot', default=True, size=(-20, 1), enable_events=True,
+                      key=self.key('manual_control')),
+             sg.Radio('Autopilot', 'pilot', size=(12, 1), enable_events=True, key=self.key('auto_pilot'))],
+            [sg.Radio('Live Data', 'data_source', default=True, size=(-20, 1), enable_events=True,
+                      key=self.key('live_data')),
+             sg.Radio('Recorded Data', 'data_source', size=(20, 1),
+                      enable_events=True, key=self.key('recorded_data'))],
+            [sg.InputText(key=self.key('data_file_picker_text'), enable_events=True, visible=True),
+             sg.FileBrowse(key=self.key('data_file_picker'), visible=True)],
             [self.read_my_mind_button],
             [sg.Text('The model says ...')],
             [sg.Table(values=[], headings=self.response_headings, auto_size_columns=False, def_col_width=15,
@@ -149,7 +156,28 @@ class BrainwaveTab(BCIGuiTab):
 
         self.reading_in_progress.clear()
 
+    def switch_to_live_data(self, window):
+        file_picker = window[self.key('data_file_picker')]
+        file_picker.update(visible=False)
+
+    def switch_to_recorded_data(self, window):
+        file_picker = window[self.key('data_file_picker')]
+        file_picker.update(visible=True)
+
     def handle_event(self, window, event, values):
+        if event == self.key('manual_control'):
+            print('Manual control')
+            return
+        if event == self.key('auto_pilot'):
+            print('Auto pilot')
+            return
+        if event == self.key('live_data'):
+            self.switch_to_live_data(window)
+            return
+        if event == self.key('recorded_data'):
+            self.switch_to_recorded_data(window)
+            return
+
         match event:
             case self.read_my_mind_button.key:
                 self.handle_read_my_mind_button(window)

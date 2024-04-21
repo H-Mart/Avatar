@@ -3,3 +3,5 @@ pandas
 numpy
 scikit-learn
 gunicorn
+tensorflow==2.15.0
+tensorflow_decision_forests==1.8.1

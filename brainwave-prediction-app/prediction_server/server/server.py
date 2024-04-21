@@ -10,9 +10,6 @@ labels = ['backward', 'down', 'forward',
           'land', 'left', 'right', 'takeoff', 'up']
 app = Flask(__name__, template_folder='templates')
 
-print(Path(app.template_folder).absolute())
-print(list(Path(app.template_folder).rglob('*')))
-
 with open(f'models/sklearn_naive.skl_model', 'rb') as f:
     model = pickle.load(f)
 

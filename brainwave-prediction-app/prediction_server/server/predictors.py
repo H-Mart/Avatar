@@ -1,4 +1,5 @@
 import tensorflow as tf
+import keras
 import numpy as np
 import pickle
 from pathlib import Path
@@ -69,12 +70,10 @@ class TensorFlowPredictor(BasePredictor):
         self.model = None
 
     def load_model(self, model_path):
-        # with open(model_path, 'rb') as f:
-        #     self.model = pickle.load(f)
-        self.model = tf.keras.models.load_model(str(model_path))
+        self.model = keras.models.load_model(str(model_path))
+        # self.model.compile(metrics=["accuracy"])
 
     def preprocess(self, data: np.ndarray):
-        # np.sort(data, axis=data_timestamp_column)
         data = data[data[:, data_timestamp_column].argsort()]
         processed_data = data[:, data_channel_columns].astype(np.float64)
 
@@ -85,17 +84,17 @@ class TensorFlowPredictor(BasePredictor):
     def predict(self, data):
         return self.model.predict(data)
 
-    def evaluate(self, data, labels):
-        predictions = self.model.predict(data)
+    def evaluate(self, test_data, test_labels):
+        predictions = self.model.predict(test_data)
         accuracy = tf.keras.metrics.Accuracy()
-        return accuracy(labels, predictions)
+        return accuracy(test_labels, predictions)
 
 
-if __name__ == '__main__':
+def main():
     from random import shuffle
     import pandas as pd
 
-    test_data = Path('/home/henry/School/csci495/bci_data/brainwave_processed')
+    test_data = Path('/mnt/i/bci_data/brainwave_processed')
     left_data = list((test_data / 'left').iterdir())
     shuffle(left_data)
     right_data = list((test_data / 'right').iterdir())
@@ -125,7 +124,7 @@ if __name__ == '__main__':
     scikit_predictor.load_model(Path('../models/sklearn_naive.skl_model'))
 
     tensorflow_predictor = TensorFlowPredictor()
-    tensorflow_predictor.load_model(Path('../models/tensorflow_naive.keras'))
+    tensorflow_predictor.load_model(Path('../models/tensorflow_naive'))
 
     for dt, label in zip(test_channel_data, test_label_data):
         processed_data_sk = scikit_predictor.preprocess(dt)
@@ -136,6 +135,9 @@ if __name__ == '__main__':
             test_label_np[test_label_np == l] = i
 
     for dt, label in zip(test_channel_data, test_label_data):
-        # processed_data_tf = tf.data.Dataset.from_tensor_slices((dt, label.astype(np.float64))).batch(100)
         processed_data_tf = tensorflow_predictor.preprocess(dt)
         print(f'Tensorflow: {tensorflow_predictor.evaluate(processed_data_tf, label.astype(np.float64))}')
+
+
+if __name__ == '__main__':
+    main()

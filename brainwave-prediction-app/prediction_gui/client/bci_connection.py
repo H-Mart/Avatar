@@ -1,3 +1,4 @@
+import pathlib
 import time
 import pandas as pd
 import requests
@@ -8,6 +9,10 @@ import os
 class BCIConnection:
     def __init__(self, prediction_server_url: str = 'http://localhost:5000', serial_port: str = '/dev/ttyUSB0',
                  use_fake_bci: bool = True):
+        self.board = None
+        self._synthetic_board = None
+        self._cyton_daisy_board = None
+        self._file_playback_board = None
 
         if os.environ.get('BCI_GUI_SERIAL_PORT'):
             serial_port = os.environ['BCI_GUI_SERIAL_PORT']
@@ -23,20 +28,29 @@ class BCIConnection:
             print(f'Using default prediction server URL: {prediction_server_url}')
         self.prediction_server_url = prediction_server_url
 
-        if os.environ.get('BCI_GUI_USE_FAKE_BCI'):
-            use_fake_bci = False # todo change to True
-            print('Using fake BCI from environment variable')
-        else:
-            print(f'Using default fake BCI setting: {use_fake_bci}')
+        self._synthetic_board = BoardShim(BoardIds.SYNTHETIC_BOARD.value, BrainFlowInputParams())
 
-        if use_fake_bci:
-            print('Using synthetic board')
-            self.board = BoardShim(BoardIds.SYNTHETIC_BOARD.value, BrainFlowInputParams())
-        else:
-            print(f'Using Cyton Daisy board with serial port: {self.serial_port}')
-            params = BrainFlowInputParams()
-            params.serial_port = self.serial_port
-            self.board = BoardShim(BoardIds.CYTON_DAISY_BOARD.value, params)
+        cyton_daisy_params = BrainFlowInputParams()
+        cyton_daisy_params.serial_port = self.serial_port
+        self._cyton_daisy_board = BoardShim(BoardIds.CYTON_DAISY_BOARD.value, cyton_daisy_params)
+
+    def load_file_board(self, file_path: pathlib.Path):
+        if not file_path.exists():
+            raise FileNotFoundError(f'File not found: {file_path}')
+        params = BrainFlowInputParams()
+        params.file = str(file_path)
+        params.master_board = BoardIds.CYTON_DAISY_BOARD
+        self.board = BoardShim(BoardIds.PLAYBACK_FILE_BOARD.value, params)
+
+    def load_synthetic_board(self):
+        if self._synthetic_board is None:
+            raise ValueError('Synthetic board must be initialized before loading synthetic board')
+        self.board = self._synthetic_board
+
+    def load_cyton_daisy_board(self):
+        if self._cyton_daisy_board is None:
+            raise ValueError('Cyton Daisy board must be initialized before loading Cyton Daisy board')
+        self.board = self._cyton_daisy_board
 
     def _read_from_board(self):
         """
@@ -110,3 +124,13 @@ class BCIConnection:
             error = e
 
         return {'error': str(error)}
+
+
+if __name__ == '__main__':
+    from pathlib import Path
+
+    bci_connection = BCIConnection()
+    bci_connection.load_file_board(
+        Path(r'/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/files_for_synthetic_run/left.txt'))
+    resp = bci_connection.read_and_transmit_data_from_board()
+    print(resp)
