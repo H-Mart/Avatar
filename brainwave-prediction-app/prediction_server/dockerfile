@@ -3,11 +3,11 @@ COPY server_requirements.txt /prediction_server/server_requirements.txt
 WORKDIR /prediction_server
 
 RUN pip install --upgrade pip
-RUN pip3 install -r server_requirements.txt
+RUN pip install -r server_requirements.txt
 
 COPY ./server /prediction_server/server
 COPY ./models /prediction_server/models
-COPY ./templates /prediction_server/templates
+# COPY ./templates /prediction_server/templates
 
 EXPOSE 8000
 

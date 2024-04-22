@@ -7,7 +7,7 @@ import os
 
 
 class BCIConnection:
-    def __init__(self, prediction_server_url: str = 'http://localhost:5000', serial_port: str = '/dev/ttyUSB0',
+    def __init__(self, prediction_server_url: str = 'http://localhost:5001', serial_port: str = '/dev/ttyUSB0',
                  use_fake_bci: bool = True):
         self.board = None
         self._synthetic_board = None
@@ -129,8 +129,7 @@ class BCIConnection:
 if __name__ == '__main__':
     from pathlib import Path
 
-    bci_connection = BCIConnection()
-    bci_connection.load_file_board(
-        Path(r'/mnt/c/Users/henry/Documents/School/csci 495/Avatar/brainwave-prediction-app/files_for_synthetic_run/left.txt'))
+    bci_connection = BCIConnection(prediction_server_url='http://localhost:5001')
+    bci_connection.load_file_board(Path('/Users/henry/PycharmProjects/Avatar/brainwave-prediction-app/files_for_synthetic_run/backward.txt'))
     resp = bci_connection.read_and_transmit_data_from_board()
     print(resp)

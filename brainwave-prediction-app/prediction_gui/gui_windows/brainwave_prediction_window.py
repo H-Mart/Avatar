@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 from threading import Event
+from pathlib import Path
 
 from .bci_gui_tab import BCIGuiTab
 
@@ -50,8 +51,9 @@ class BrainwaveTab(BCIGuiTab):
                       key=self.key('live_data')),
              sg.Radio('Recorded Data', 'data_source', size=(20, 1),
                       enable_events=True, key=self.key('recorded_data'))],
-            [sg.InputText(key=self.key('data_file_picker_text'), enable_events=True, visible=True),
-             sg.FileBrowse(key=self.key('data_file_picker'), visible=True)],
+            [sg.Text('Path to directory containing data files')],
+            [sg.InputText(key=self.key('data_file_picker_text'), enable_events=True, visible=False),
+             sg.FileBrowse(key=self.key('data_file_picker'), visible=False)],
             [self.read_my_mind_button],
             [sg.Text('The model says ...')],
             [sg.Table(values=[], headings=self.response_headings, auto_size_columns=False, def_col_width=15,
@@ -157,12 +159,16 @@ class BrainwaveTab(BCIGuiTab):
         self.reading_in_progress.clear()
 
     def switch_to_live_data(self, window):
+        file_picker_text = window[self.key('data_file_picker_text')]
         file_picker = window[self.key('data_file_picker')]
         file_picker.update(visible=False)
+        file_picker_text.update(visible=False)
 
     def switch_to_recorded_data(self, window):
+        file_picker_text = window[self.key('data_file_picker_text')]
         file_picker = window[self.key('data_file_picker')]
         file_picker.update(visible=True)
+        file_picker_text.update(visible=True)
 
     def handle_event(self, window, event, values):
         if event == self.key('manual_control'):
@@ -176,6 +182,13 @@ class BrainwaveTab(BCIGuiTab):
             return
         if event == self.key('recorded_data'):
             self.switch_to_recorded_data(window)
+            return
+        if event == self.key('data_file_picker_text'):
+            try:
+                file = Path(values[event])
+                self.bci_connection.load_file_board(file)
+            except Exception as e:
+                print(f'Error loading file: {e}')
             return
 
         match event:

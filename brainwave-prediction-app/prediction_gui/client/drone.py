@@ -1,20 +1,48 @@
+import time
+
 from djitellopy import Tello
+from threading import Thread, Event
 
 
 class Drone:
-    def __init__(self, testing=False):
+    def __init__(self, testing=False, keep_alive=True):
         if testing:
             self.tello = None
         else:
             self.tello = Tello()
 
+        self.time_of_last_action = 0
+        self.max_time_between_actions = 5
+
+        self.should_ping = Event()
+        self.keep_alive_thread = None
+
+    def keep_alive(self):
+        def ping():
+            while self.should_ping.is_set():
+                try:
+                    if time.time() - self.time_of_last_action > self.max_time_between_actions:
+                        self.send_action('keep alive')
+                except Exception as e:
+                    print(e)
+                time.sleep(1)
+            self.keep_alive_thread = None
+
+        self.should_ping.set()
+        self.keep_alive_thread = Thread(target=ping)
+        self.keep_alive_thread.start()
+
     def send_action(self, action: str):
         if self.tello is None:
             return self._get_drone_action_testing(action)
         else:
+            self.time_of_last_action = time.time()
             return self._execute_drone_action(action)
 
     def _execute_drone_action(self, action: str):
+        if not self.keep_alive_thread and action != 'land':
+            self.keep_alive()
+
         translation_distance = 30
         rotation_angle = 45
 
@@ -39,6 +67,9 @@ class Drone:
             'flip': self.tello.flip_back,
             'keep alive': self.tello.query_battery,
         }
+
+        if action == 'land':
+            self.should_ping.clear()
 
         if action in translation_actions:
             translation_actions[action](translation_distance)
